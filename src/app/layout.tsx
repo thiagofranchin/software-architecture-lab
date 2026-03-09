@@ -4,6 +4,7 @@ import {
   Montserrat,
   Ubuntu_Mono,
 } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const fontSans = Montserrat({
@@ -39,9 +40,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable}`}
     >
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`(() => {
+            const storedTheme = localStorage.getItem("theme");
+            const theme = storedTheme === "light" || storedTheme === "dark"
+              ? storedTheme
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light";
+            document.documentElement.classList.toggle("dark", theme === "dark");
+          })();`}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }
