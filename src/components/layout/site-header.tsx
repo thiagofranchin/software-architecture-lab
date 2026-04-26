@@ -67,7 +67,7 @@ export function SiteHeader() {
                   "relative rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
                   active
                     ? "bg-secondary text-secondary-foreground"
-                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:text-foreground dark:[text-shadow:none] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.25)]",
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:text-foreground dark:text-shadow-none dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.25)]",
                 )}
               >
                 {item.label}
