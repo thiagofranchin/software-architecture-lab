@@ -1,0 +1,127 @@
+---
+title: "Strategy"
+slug: "strategy"
+description: "Substitua condicionais que crescem com o negócio por comportamentos intercambiáveis. O Strategy isola o que varia e deixa o restante do código estável."
+category: "Patterns"
+level: "Intermediário"
+duration: "14 min"
+tags:
+  - padrões
+  - design-patterns
+  - strategy
+  - polimorfismo
+related:
+  - observer
+  - adapter
+  - separacao-de-responsabilidades
+published: true
+order: 1
+---
+
+## Resumo
+
+**Strategy** é um padrão comportamental que define uma família de algoritmos, encapsula cada um deles e os torna intercambiáveis. O código que usa o algoritmo não precisa saber qual variante está executando.
+
+Em termos práticos: quando você tem lógica que muda dependendo de um tipo, contexto ou configuração, Strategy é a forma de isolar essa variação sem poluir o resto do código com condicionais.
+
+## Problema que resolve
+
+Blocos `if/else` ou `switch` que crescem a cada nova regra de negócio são o sintoma clássico. Cada adição exige abrir a mesma função, entender tudo de novo e torcer para não quebrar os casos anteriores.
+
+```ts
+// Este bloco vai crescer para sempre:
+function aplicarDesconto(pedido: Pedido) {
+  if (pedido.cliente === "vip") {
+    return pedido.total * 0.8;
+  } else if (pedido.cliente === "recorrente") {
+    return pedido.total * 0.9;
+  } else if (pedido.cliente === "novo") {
+    return pedido.total * 0.95;
+  }
+  return pedido.total;
+}
+```
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Condicional que cresce com o negócio">
+
+```ts
+function aplicarDesconto(pedido: Pedido) {
+  if (pedido.cliente === "vip") {
+    return pedido.total * 0.8;
+  } else if (pedido.cliente === "recorrente") {
+    return pedido.total * 0.9;
+  } else if (pedido.cliente === "novo") {
+    return pedido.total * 0.95;
+  }
+  return pedido.total;
+}
+// cada nova categoria de cliente = nova linha aqui
+```
+
+</CodeBad>
+<CodeGood title="Strategy — cada regra isolada">
+
+```ts
+interface DescontoStrategy {
+  aplicar(total: number): number;
+}
+
+const descontos: Record<string, DescontoStrategy> = {
+  vip:        { aplicar: (v) => v * 0.8 },
+  recorrente: { aplicar: (v) => v * 0.9 },
+  novo:       { aplicar: (v) => v * 0.95 },
+  padrao:     { aplicar: (v) => v },
+};
+
+function aplicarDesconto(pedido: Pedido) {
+  const estrategia = descontos[pedido.cliente] ?? descontos.padrao;
+  return estrategia.aplicar(pedido.total);
+}
+// nova categoria = nova entrada no objeto, zero mudança na função
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando usar
+
+- A mesma operação tem variações que mudam por tipo, contexto ou configuração.
+- Um `if/else` ou `switch` cresce a cada sprint com novos casos.
+- Você precisa trocar o comportamento em tempo de execução (ex: tema, idioma, modo de pagamento).
+- Testes unitários estão complicados porque uma função faz coisas demais.
+
+<Callout variant="sucesso" title="Sinal claro">
+Se adicionar uma nova variante exige abrir a mesma função, o Strategy é a solução. Cada nova strategy é um arquivo novo — o código existente não muda.
+</Callout>
+
+## Quando não usar
+
+- Você tem dois casos e a lógica raramente muda. Um `if` simples é mais legível.
+- A "família de algoritmos" tem só um membro hoje e sem previsão de crescer.
+
+<Callout variant="atencao" title="Cuidado com antecipação">
+Não crie strategies para problemas que ainda não existem. O padrão resolve a explosão de condicionais — se ainda não há explosão, não há problema a resolver.
+</Callout>
+
+## Onde aparece no dia a dia
+
+- **Validação de formulários**: cada campo tem sua strategy de validação.
+- **Cálculo de frete**: cada transportadora implementa a mesma interface.
+- **Autenticação**: JWT, OAuth, session — cada um é uma strategy.
+- **Renderização condicional por permissão**: cada role renderiza uma versão diferente.
+- **Ordenação de listas**: critérios de ordenação como strategies intercambiáveis.
+
+## Erros comuns
+
+- Criar uma interface Strategy com um único método `execute()` genérico demais — o nome importa, seja específico.
+- Usar Strategy quando um simples mapa de funções resolveria sem a cerimônia de classes e interfaces.
+- Injetar a strategy via construtor quando ela deveria ser passada por parâmetro (mais flexível).
+
+## Conceitos relacionados
+
+- [Separação de Responsabilidades](/conceitos/separacao-de-responsabilidades) — o princípio que o Strategy aplica ao isolar a lógica variável.
+- [Observer](/conceitos/observer) — outro padrão que desacopla comportamento, mas por eventos.
+- [Adapter](/conceitos/adapter) — desacopla interfaces em vez de algoritmos.

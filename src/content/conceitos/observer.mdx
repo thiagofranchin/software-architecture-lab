@@ -1,0 +1,130 @@
+---
+title: "Observer"
+slug: "observer"
+description: "Deixe partes do sistema reagirem a eventos sem que o emissor saiba quem está ouvindo. A base de todo sistema de eventos, notificações e reatividade."
+category: "Patterns"
+level: "Intermediário"
+duration: "12 min"
+tags:
+  - padrões
+  - design-patterns
+  - observer
+  - eventos
+  - reatividade
+related:
+  - strategy
+  - adapter
+  - acoplamento
+published: true
+order: 2
+---
+
+## Resumo
+
+**Observer** é um padrão comportamental que define uma relação de um-para-muitos entre objetos: quando um objeto muda de estado, todos os seus dependentes são notificados automaticamente.
+
+O emissor (subject) não sabe quem são os ouvintes (observers) — apenas publica o evento. Quem quiser reagir, se inscreve. Isso inverte a dependência: em vez de A chamar B diretamente, B diz a A que quer ser notificado.
+
+## Problema que resolve
+
+Módulos que precisam reagir a mudanças de outros módulos tendem a criar acoplamento direto. O módulo de pedidos chama o de e-mail, que chama o de estoque, que chama o de relatório. Qualquer mudança em um quebra os outros.
+
+```ts
+// Acoplamento direto — pedidos sabe de tudo:
+function confirmarPedido(pedido: Pedido) {
+  salvarNoBanco(pedido);
+  emailService.enviarConfirmacao(pedido);     // acoplado
+  estoqueService.reservarItens(pedido);       // acoplado
+  relatorioService.registrarVenda(pedido);    // acoplado
+}
+```
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Chamadas diretas — acoplamento crescente">
+
+```ts
+function confirmarPedido(pedido: Pedido) {
+  salvarNoBanco(pedido);
+  emailService.enviarConfirmacao(pedido);
+  estoqueService.reservarItens(pedido);
+  relatorioService.registrarVenda(pedido);
+  // cada nova reação = nova linha aqui
+}
+```
+
+</CodeBad>
+<CodeGood title="Observer — emissor desconhece os ouvintes">
+
+```ts
+class EventBus {
+  private handlers = new Map<string, Function[]>();
+
+  on(event: string, handler: Function) {
+    const list = this.handlers.get(event) ?? [];
+    this.handlers.set(event, [...list, handler]);
+  }
+
+  emit(event: string, payload: unknown) {
+    this.handlers.get(event)?.forEach((h) => h(payload));
+  }
+}
+
+const bus = new EventBus();
+
+// cada módulo se inscreve independentemente:
+bus.on("pedido.confirmado", emailService.enviarConfirmacao);
+bus.on("pedido.confirmado", estoqueService.reservarItens);
+bus.on("pedido.confirmado", relatorioService.registrarVenda);
+
+function confirmarPedido(pedido: Pedido) {
+  salvarNoBanco(pedido);
+  bus.emit("pedido.confirmado", pedido);
+  // nova reação = nova inscrição, zero mudança aqui
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando usar
+
+- Um evento precisa notificar múltiplos módulos sem que o emissor conheça nenhum deles.
+- O número de reações ao evento pode crescer com o tempo (novos módulos, integrações).
+- Você precisa desacoplar o que acontece de quem reage ao que acontece.
+- Sistemas reativos: estado que propaga mudanças (signals, stores, streams).
+
+<Callout variant="sucesso" title="Onde você já usa sem saber">
+`addEventListener` no DOM, `useEffect` no React, `Subject` no RxJS, eventos de domínio no backend — todos são Observer. O padrão é a base da maioria dos sistemas reativos modernos.
+</Callout>
+
+## Quando não usar
+
+- Há apenas um ouvinte fixo e isso não vai mudar — uma chamada direta é mais clara.
+- O fluxo precisa ser rastreável e síncrono. Eventos assíncronos dificultam o debug.
+- O volume de eventos é tão alto que o overhead de despacho vira problema de performance.
+
+<Callout variant="atencao" title="Cuidado com event spaghetti">
+Sistemas que abusam de eventos globais ficam difíceis de rastrear: "quem emite isso? quem escuta aquilo?" Se todo fluxo passa por um bus global sem documentação, você trocou acoplamento direto por acoplamento implícito — que é pior.
+</Callout>
+
+## Onde aparece no dia a dia
+
+- **Sistemas de notificação**: pedido confirmado dispara e-mail, SMS e push.
+- **Stores reativos**: Zustand, Redux, Pinia — todos implementam Observer internamente.
+- **WebSockets / SSE**: servidor emite eventos, clientes inscritos reagem.
+- **Formulários**: campo A muda → campo B se atualiza automaticamente.
+- **Analytics**: eventos de interação do usuário observados por múltiplos trackers.
+
+## Erros comuns
+
+- Criar um event bus global com eventos de string sem tipagem — difícil de refatorar.
+- Esquecer de cancelar inscrições (`off` / `unsubscribe`) e vazar memória.
+- Usar Observer para fluxos que precisam de resposta síncrona — ele é fire-and-forget por natureza.
+
+## Conceitos relacionados
+
+- [Acoplamento](/conceitos/acoplamento) — o problema que o Observer reduz ao inverter dependências.
+- [Strategy](/conceitos/strategy) — outro padrão comportamental, mas para algoritmos em vez de eventos.
+- [Adapter](/conceitos/adapter) — útil para adaptar interfaces de event emitters incompatíveis.

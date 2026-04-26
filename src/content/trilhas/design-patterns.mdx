@@ -1,0 +1,151 @@
+---
+title: "Design Patterns"
+slug: "design-patterns"
+description: "Aprenda os padrões de projeto mais usados na prática: quando aplicá-los, quando evitá-los e como eles resolvem problemas recorrentes de arquitetura."
+category: "Patterns"
+level: "Intermediário"
+duration: "3h 30min"
+tags:
+  - padrões
+  - design-patterns
+  - strategy
+  - observer
+  - factory
+  - adapter
+related:
+  - strategy
+  - observer
+  - factory
+  - adapter
+published: true
+order: 3
+---
+
+## Sobre esta trilha
+
+A trilha **Design Patterns** responde a uma pergunta que aparece em todo projeto que cresceu: **"já escrevi isso antes — mas diferente"**.
+
+Padrões de projeto são soluções nomeadas para problemas recorrentes de design. Eles não são frameworks nem bibliotecas — são vocabulário. Quando você e seu time conhecem os padrões, a conversa muda de "aquela coisa que faz assim" para "aplica um Strategy aí".
+
+<Callout variant="info" title="Para quem é">
+Desenvolvedores que já têm familiaridade com as trilhas de Fundamentos e Arquitetura Frontend, e querem sair do "sei que existe" para "sei quando e como usar".
+</Callout>
+
+## O que você vai aprender
+
+- O que diferencia um padrão de uma solução genérica.
+- Como Strategy elimina condicionais que crescem junto com o negócio.
+- Como Observer desacopla partes que precisam reagir umas às outras.
+- Como Factory centraliza a criação de objetos complexos.
+- Como Adapter conecta interfaces incompatíveis sem reescrever nada.
+- Quando padrões ajudam — e quando atrapalham.
+
+## Aulas
+
+<div className="flex flex-col gap-4">
+  <ConceptCard
+    order={1}
+    title="Strategy"
+    description="Substitua condicionais que crescem com o negócio por comportamentos intercambiáveis. O Strategy é o padrão mais útil para sistemas que mudam frequentemente."
+    slug="strategy"
+    category="Patterns"
+    level="Intermediário"
+    duration="14 min"
+  />
+
+  <ConceptCard
+    order={2}
+    title="Observer"
+    description="Deixe partes do sistema reagirem a eventos sem que o emissor saiba quem está ouvindo. A base de todo sistema de eventos, notificações e reatividade."
+    slug="observer"
+    category="Patterns"
+    level="Intermediário"
+    duration="12 min"
+  />
+
+  <ConceptCard
+    order={3}
+    title="Factory"
+    description="Centralize a criação de objetos complexos num único lugar. Quando a lógica de instanciação cresce, Factory evita que ela vaze pelo sistema inteiro."
+    slug="factory"
+    category="Patterns"
+    level="Intermediário"
+    duration="10 min"
+  />
+
+  <ConceptCard
+    order={4}
+    title="Adapter"
+    description="Conecte interfaces incompatíveis sem reescrever nenhuma das duas partes. O padrão essencial para integrar APIs externas e bibliotecas de terceiros."
+    slug="adapter"
+    category="Patterns"
+    level="Intermediário"
+    duration="12 min"
+  />
+</div>
+
+## Padrões não são receitas
+
+O erro mais comum ao aprender padrões é aplicá-los porque "parece certo", não porque há um problema real sendo resolvido. Padrões emergem — você os reconhece depois que o problema aparece, não antes.
+
+| Padrão | Problema que resolve | Sinal de que é hora de aplicar |
+|--------|---------------------|-------------------------------|
+| **Strategy** | Lógica que varia por tipo ou contexto | `if (tipo === "A") ... else if (tipo === "B")...` que cresce a cada sprint |
+| **Observer** | Reação a eventos entre partes desacopladas | Chamadas diretas entre módulos que não deveriam se conhecer |
+| **Factory** | Criação complexa espalhada pelo código | `new Coisa(dep1, dep2, dep3)` repetido em vários lugares |
+| **Adapter** | Integração com interface incompatível | Código de terceiros misturado com lógica de domínio |
+
+## Strategy em prática: antes e depois
+
+O exemplo mais didático de como um padrão transforma código real:
+
+<CompareGrid>
+<CodeBad title="Sem padrão — cresce para sempre">
+
+```ts
+function calcularFrete(pedido: Pedido) {
+  if (pedido.modalidade === "sedex") {
+    return pedido.peso * 8.5;
+  } else if (pedido.modalidade === "pac") {
+    return pedido.peso * 4.2;
+  } else if (pedido.modalidade === "retirada") {
+    return 0;
+  }
+  // cada nova transportadora = novo else if
+}
+```
+
+</CodeBad>
+<CodeGood title="Com Strategy — aberto para extensão">
+
+```ts
+interface FreteStrategy {
+  calcular(pedido: Pedido): number;
+}
+
+const estrategias: Record<string, FreteStrategy> = {
+  sedex: { calcular: (p) => p.peso * 8.5 },
+  pac:   { calcular: (p) => p.peso * 4.2 },
+  retirada: { calcular: () => 0 },
+};
+
+function calcularFrete(pedido: Pedido) {
+  return estrategias[pedido.modalidade].calcular(pedido);
+}
+// nova transportadora = nova entrada no objeto, zero mudança no resto
+```
+
+</CodeGood>
+</CompareGrid>
+
+<Callout variant="atencao" title="Quando não usar padrões">
+Se a lógica tem apenas dois casos e raramente muda, um `if` simples é mais legível que um padrão inteiro. Padrões custam complexidade — só valem quando o problema que resolvem é real e recorrente.
+</Callout>
+
+## Próximos passos
+
+Depois desta trilha, os caminhos naturais são:
+
+- **Arquitetura Backend** — como padrões como Repository e Service Layer organizam o lado do servidor.
+- **Prática** — exercícios que combinam padrões com decisões arquiteturais reais.
+- **Separação de Responsabilidades** e **Acoplamento** — os princípios que justificam a maioria dos padrões vistos aqui.

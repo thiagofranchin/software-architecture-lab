@@ -1,0 +1,115 @@
+---
+title: "Factory"
+slug: "factory"
+description: "Centralize a criação de objetos complexos num único lugar. Quando a lógica de instanciação cresce, Factory evita que ela vaze pelo sistema inteiro."
+category: "Patterns"
+level: "Intermediário"
+duration: "10 min"
+tags:
+  - padrões
+  - design-patterns
+  - factory
+  - criação
+  - instanciação
+related:
+  - strategy
+  - adapter
+  - separacao-de-responsabilidades
+published: true
+order: 3
+---
+
+## Resumo
+
+**Factory** é um padrão criacional que centraliza a responsabilidade de instanciar objetos. Em vez de espalhar `new Coisa(dep1, dep2, config)` pelo código, você delega essa lógica a uma função ou classe especializada.
+
+O chamador não sabe como o objeto é criado — só o que ele faz. Isso isola a complexidade de construção e facilita trocar implementações sem tocar em quem usa.
+
+## Problema que resolve
+
+Objetos complexos precisam de dependências, configurações e lógica para serem construídos corretamente. Quando essa lógica fica espalhada, qualquer mudança (novo parâmetro, nova dependência) exige varrer o código inteiro.
+
+```ts
+// Espalhado pelo código — cada lugar faz do seu jeito:
+const logger = new Logger(process.env.LOG_LEVEL, new FileTransport("/logs/app.log"), true);
+const logger2 = new Logger(process.env.LOG_LEVEL, new ConsoleTransport(), false);
+// se Logger ganhar um novo parâmetro obrigatório, todos quebram
+```
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Instanciação espalhada">
+
+```ts
+// em auth.service.ts
+const repo = new UserRepository(db, new CacheAdapter(redis), true);
+
+// em user.controller.ts
+const repo = new UserRepository(db, new CacheAdapter(redis), true);
+
+// em admin.service.ts
+const repo = new UserRepository(db, null, false);
+
+// cada arquivo sabe demais sobre como criar o repositório
+```
+
+</CodeBad>
+<CodeGood title="Factory — criação centralizada">
+
+```ts
+// repositories/user-repository.factory.ts
+function createUserRepository(opts?: { cache?: boolean }) {
+  const cache = opts?.cache !== false ? new CacheAdapter(redis) : null;
+  return new UserRepository(db, cache, true);
+}
+
+// em qualquer lugar:
+const repo = createUserRepository();
+const repoSemCache = createUserRepository({ cache: false });
+
+// mudou o construtor? muda só a factory.
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando usar
+
+- A criação de um objeto exige lógica condicional (tipo, ambiente, configuração).
+- O mesmo objeto é instanciado em múltiplos lugares com os mesmos parâmetros.
+- Você quer poder trocar a implementação (ex: repositório real vs. in-memory nos testes) sem mudar o código que usa.
+- Dependências são difíceis de lembrar ou ordenar corretamente.
+
+<Callout variant="sucesso" title="Testabilidade">
+Factories facilitam muito os testes: em vez de mockar dependências em cada teste, você cria uma `createUserRepositoryInMemory()` e usa em todos. Um lugar para manter, zero repetição.
+</Callout>
+
+## Quando não usar
+
+- O objeto é simples e tem apenas um jeito de ser criado — `new Coisa()` direto é mais claro.
+- A Factory viraria um wrapper vazio sem lógica real, só adicionando indireção.
+
+<Callout variant="atencao" title="Factory vs. Service Locator">
+Factory cria objetos. Service Locator os resolve globalmente a partir de um registro central. O segundo cria dependências implícitas e dificulta o rastreamento — prefira Factory com injeção explícita.
+</Callout>
+
+## Onde aparece no dia a dia
+
+- **Testes**: `createTestUser()`, `createMockOrder()` — fixtures geradas por factories.
+- **Configuração por ambiente**: factory que retorna implementação real em prod e stub em dev.
+- **Clientes HTTP**: factory que configura base URL, headers e interceptors de uma vez.
+- **Conexões de banco**: pool criado e configurado em um único lugar.
+- **Componentes de UI**: factory que encapsula configuração de temas ou providers.
+
+## Erros comuns
+
+- Chamar de "Factory" qualquer função que retorna algo — o padrão tem sentido quando há complexidade ou variação na criação.
+- Criar uma `MegaFactory` que sabe criar qualquer coisa — viola Separação de Responsabilidades.
+- Usar Factory quando injeção de dependência direta seria mais simples e explícita.
+
+## Conceitos relacionados
+
+- [Separação de Responsabilidades](/conceitos/separacao-de-responsabilidades) — o princípio que justifica centralizar a criação num único lugar.
+- [Strategy](/conceitos/strategy) — frequentemente combinado com Factory para criar a strategy correta por contexto.
+- [Adapter](/conceitos/adapter) — factories são comuns para criar adapters configurados.

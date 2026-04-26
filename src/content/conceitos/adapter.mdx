@@ -1,0 +1,138 @@
+---
+title: "Adapter"
+slug: "adapter"
+description: "Conecte interfaces incompatíveis sem reescrever nenhuma das duas partes. O padrão essencial para integrar APIs externas e bibliotecas de terceiros."
+category: "Patterns"
+level: "Intermediário"
+duration: "12 min"
+tags:
+  - padrões
+  - design-patterns
+  - adapter
+  - integração
+  - abstração
+related:
+  - strategy
+  - factory
+  - acoplamento
+published: true
+order: 4
+---
+
+## Resumo
+
+**Adapter** é um padrão estrutural que converte a interface de uma classe em outra interface esperada pelo cliente. Ele permite que classes com interfaces incompatíveis trabalhem juntas sem modificar nenhuma das duas.
+
+Em termos práticos: seu código fala uma linguagem, a API externa fala outra. O Adapter traduz no meio — e quando a API muda ou você troca de provedor, só o Adapter muda.
+
+## Problema que resolve
+
+Integrar serviços externos diretamente no código de domínio cria acoplamento com algo que você não controla. Quando o SDK muda, quando você troca de provedor de e-mail, de pagamento ou de storage — o estrago se espalha por todo lugar onde o SDK foi chamado diretamente.
+
+```ts
+// SDK de e-mail chamado diretamente no domínio:
+import { SendGrid } from "@sendgrid/mail";
+
+async function notificarCliente(pedido: Pedido) {
+  const sg = new SendGrid(process.env.SENDGRID_KEY);
+  await sg.send({
+    to: pedido.email,
+    from: "noreply@empresa.com",
+    subject: "Pedido confirmado",
+    html: `<p>Seu pedido #${pedido.id} foi confirmado.</p>`,
+  });
+}
+// trocar de SendGrid para AWS SES = reescrever todas as funções que o usam
+```
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="SDK externo acoplado ao domínio">
+
+```ts
+import { SendGrid } from "@sendgrid/mail";
+
+// domínio conhece SendGrid diretamente
+async function notificarCliente(pedido: Pedido) {
+  const sg = new SendGrid(process.env.SENDGRID_KEY);
+  await sg.send({
+    to: pedido.email,
+    from: "noreply@empresa.com",
+    subject: "Pedido confirmado",
+    html: `<p>Pedido #${pedido.id} confirmado.</p>`,
+  });
+}
+```
+
+</CodeBad>
+<CodeGood title="Adapter — domínio fala sua própria língua">
+
+```ts
+// porta do domínio — interface que o domínio define:
+interface EmailService {
+  enviar(params: { para: string; assunto: string; html: string }): Promise<void>;
+}
+
+// adapter — traduz para o SDK externo:
+class SendGridAdapter implements EmailService {
+  private sg = new SendGrid(process.env.SENDGRID_KEY);
+
+  async enviar({ para, assunto, html }) {
+    await this.sg.send({ to: para, from: "noreply@empresa.com", subject: assunto, html });
+  }
+}
+
+// domínio só conhece a interface:
+async function notificarCliente(pedido: Pedido, email: EmailService) {
+  await email.enviar({
+    para: pedido.email,
+    assunto: "Pedido confirmado",
+    html: `<p>Pedido #${pedido.id} confirmado.</p>`,
+  });
+}
+// trocar de SendGrid para AWS SES = criar SesAdapter, zero mudança no domínio
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando usar
+
+- Integrar uma biblioteca ou API externa ao código de domínio.
+- Você quer poder trocar de provedor (pagamento, e-mail, storage, analytics) sem reescrever o domínio.
+- Testes precisam de uma implementação fake simples — o Adapter facilita criar um `EmailServiceInMemory`.
+- Duas partes do sistema usam estruturas de dados incompatíveis e precisam se comunicar.
+
+<Callout variant="sucesso" title="Testabilidade imediata">
+Quando o domínio depende de uma interface `EmailService`, o teste pode injetar `EmailServiceInMemory` sem nenhum mock de biblioteca. O Adapter desacopla o domínio do mundo externo de forma testável por padrão.
+</Callout>
+
+## Quando não usar
+
+- A integração é trivial e tem um único ponto de uso — a indireção pode custar mais do que vale.
+- O "adaptado" já fala exatamente a linguagem do domínio — não há incompatibilidade real a resolver.
+
+<Callout variant="atencao" title="Não vaze o SDK pela interface">
+A interface que o Adapter implementa deve falar a linguagem do domínio, não do SDK. Se sua interface `EmailService` tem métodos como `setSendGridKey()` ou parâmetros `sgPayload`, o Adapter está ao contrário — o SDK está ditando a interface do domínio.
+</Callout>
+
+## Onde aparece no dia a dia
+
+- **Pagamentos**: `PagamentoService` implementado por `StripeAdapter`, `MercadoPagoAdapter`.
+- **Storage**: `ArquivoService` implementado por `S3Adapter`, `LocalDiskAdapter`.
+- **Autenticação**: `AuthProvider` implementado por `FirebaseAdapter`, `Auth0Adapter`.
+- **Analytics**: `TrackingService` implementado por `MixpanelAdapter`, `AmplitudeAdapter`.
+- **Notificações push**: `PushService` implementado por `FCMAdapter`, `APNSAdapter`.
+
+## Erros comuns
+
+- Criar Adapters com lógica de negócio — o Adapter deve apenas traduzir, não decidir.
+- Expor tipos do SDK externo na interface do Adapter — o domínio passa a depender do SDK indiretamente.
+- Criar um Adapter para algo que nunca vai mudar e nunca precisará ser testado isoladamente.
+
+## Conceitos relacionados
+
+- [Acoplamento](/conceitos/acoplamento) — o problema central que o Adapter reduz ao proteger o domínio de dependências externas.
+- [Strategy](/conceitos/strategy) — frequentemente usado junto: Adapter adapta a interface, Strategy decide qual Adapter usar.
+- [Factory](/conceitos/factory) — factories criam e configuram Adapters sem expor os detalhes de instanciação.
