@@ -105,22 +105,33 @@ Se você perceber que precisa mudar o comportamento para refatorar corretamente,
 
 ## O processo prático
 
-```
-1. Confirme que os testes existem e estão passando
-   → Se não existem, escreva-os antes de continuar
-
-2. Identifique um smell ou problema específico (não "tudo aqui está ruim")
-
-3. Aplique uma refatoração de cada vez
-
-4. Rode os testes após cada passo
-
-5. Se os testes ficarem vermelhos:
-   → Não avance. Entenda o que quebrou.
-   → Se necessário, reverta o passo e tente novamente.
-
-6. Faça commit quando os testes estiverem verdes e a mudança fizer sentido sozinha
-```
+<ProcessSteps
+  variant="pratica"
+  eyebrow="Processo prático"
+  title="Sequência recomendada para refatorar com segurança"
+  description="Pense no fluxo como uma rotina curta e repetível: proteção → mudança pequena → validação → commit. Cada passo existe para reduzir risco e facilitar reversão."
+>
+  <ProcessStep
+    title="Confirme que os testes existem e estão passando"
+    note="Se ainda não existem, escreva-os antes de continuar."
+  />
+  <ProcessStep
+    title='Identifique um smell ou problema específico'
+    note='Evite começar com algo difuso como "tudo aqui está ruim".'
+  />
+  <ProcessStep title="Aplique uma refatoração de cada vez" />
+  <ProcessStep title="Rode os testes após cada passo" />
+  <ProcessStep
+    title="Se os testes ficarem vermelhos, pare no mesmo ponto"
+    tone="attention"
+  >
+    Não avance enquanto a causa não estiver clara.
+  </ProcessStep>
+  <ProcessStep
+    title="Faça commit quando os testes estiverem verdes"
+    note="A mudança precisa fazer sentido sozinha e poder ser revertida sem arrastar o restante da sessão."
+  />
+</ProcessSteps>
 
 ## Quando *não* refatorar
 

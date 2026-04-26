@@ -1,6 +1,6 @@
-"use client";
+import { ArrowDown, ArrowRight, Database, Globe, Layers3, ServerCog } from "lucide-react";
 
-import { useId } from "react";
+import { cn } from "@/lib/utils";
 
 type CometNode = {
   label: string;
@@ -15,11 +15,82 @@ type CometFlowProps = {
   duration?: number;
 };
 
-const NODE_W = 96;
-const NODE_H = 44;
-const ARROW_W = 40;
-const PAD = 28;
-const MID_Y = NODE_H / 2 + PAD;
+function toSafeId(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "comet-flow";
+}
+
+function getNodeKind(label: string, index: number, total: number) {
+  const normalized = label.toLowerCase();
+
+  if (normalized.includes("service")) {
+    return "service";
+  }
+
+  if (index === 0 || index === total - 1) {
+    return "edge";
+  }
+
+  return "support";
+}
+
+function getNodeIcon(label: string, index: number, total: number) {
+  const normalized = label.toLowerCase();
+
+  if (normalized.includes("request") || normalized.includes("http")) {
+    return Globe;
+  }
+
+  if (normalized.includes("service")) {
+    return Layers3;
+  }
+
+  if (normalized.includes("repository")) {
+    return ServerCog;
+  }
+
+  if (normalized.includes("database") || normalized.includes("db")) {
+    return Database;
+  }
+
+  if (index === total - 1) {
+    return Database;
+  }
+
+  return Layers3;
+}
+
+function getNodeTone(kind: ReturnType<typeof getNodeKind>) {
+  switch (kind) {
+    case "service":
+      return {
+        card:
+          "border-primary/45 bg-primary/10 shadow-[0_0_0_1px_color-mix(in_oklab,var(--primary)_22%,transparent),0_18px_36px_-24px_color-mix(in_oklab,var(--primary)_65%,transparent)] dark:bg-primary/12",
+        badge: "border-primary/40 bg-primary/14 text-primary",
+        title: "text-primary",
+        sublabel: "text-foreground/78",
+        connector: "bg-primary/35",
+        dot: "bg-primary shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_60%,transparent)]",
+      };
+    case "edge":
+      return {
+        card: "border-accent/35 bg-accent/8",
+        badge: "border-accent/35 bg-accent/14 text-accent-foreground",
+        title: "text-foreground",
+        sublabel: "text-muted-foreground/90",
+        connector: "bg-accent/30",
+        dot: "bg-accent",
+      };
+    default:
+      return {
+        card: "border-border/70 bg-background/80",
+        badge: "border-border/70 bg-muted/70 text-foreground/85",
+        title: "text-foreground",
+        sublabel: "text-muted-foreground",
+        connector: "bg-border",
+        dot: "bg-muted-foreground/80",
+      };
+  }
+}
 
 export function CometFlow({
   title = "Fluxo de Dados",
@@ -27,16 +98,12 @@ export function CometFlow({
   cometLabel = "request",
   duration = 4,
 }: CometFlowProps) {
-  const uid = useId().replace(/:/g, "");
-  const totalW = PAD * 2 + nodes.length * NODE_W + (nodes.length - 1) * ARROW_W;
-  const totalH = NODE_H + PAD * 2 + 20; // +20 for sublabels
-
-  const cometPathD = `M ${PAD} ${MID_Y} L ${totalW - PAD} ${MID_Y}`;
-  const travelDist = totalW - PAD * 2;
+  const uid = toSafeId(`${title}-${cometLabel}-${nodes.map((node) => node.label).join("-")}`);
+  const cometAnim = `cf-comet-${uid}`;
+  const cometGlowAnim = `cf-comet-glow-${uid}`;
 
   return (
     <div className="my-6 overflow-hidden rounded-xl border border-border/60 bg-card">
-      {/* Header LCARS */}
       <div className="flex items-center justify-between border-b border-border/60 bg-muted/40 px-5 py-3">
         <span className="font-mono text-[0.65rem] uppercase tracking-[0.15em] text-muted-foreground/70">
           {title}
@@ -46,180 +113,152 @@ export function CometFlow({
         </span>
       </div>
 
-      <div className="overflow-x-auto p-4">
+      <div className="p-4 sm:p-5">
         <style>{`
-          @keyframes comet-travel-${uid} {
-            0%   { transform: translateX(0px);           opacity: 0; }
-            5%   { opacity: 1; }
-            90%  { opacity: 1; }
-            100% { transform: translateX(${travelDist}px); opacity: 0; }
+          @keyframes ${cometAnim} {
+            0% { left: 0%; opacity: 0; }
+            8% { opacity: 1; }
+            92% { opacity: 1; }
+            100% { left: calc(100% - 0.9rem); opacity: 0; }
           }
-          @keyframes comet-tail-${uid} {
-            0%   { transform: translateX(0px);           opacity: 0; }
-            5%   { opacity: 0.35; }
-            90%  { opacity: 0.35; }
-            100% { transform: translateX(${travelDist}px); opacity: 0; }
+          @keyframes ${cometGlowAnim} {
+            0% { left: -1.25rem; opacity: 0; }
+            8% { opacity: 0.65; }
+            92% { opacity: 0.65; }
+            100% { left: calc(100% - 2.25rem); opacity: 0; }
           }
           @media (prefers-reduced-motion: reduce) {
-            .comet-head-${uid}, .comet-tail1-${uid}, .comet-tail2-${uid} {
+            .${uid}-comet,
+            .${uid}-comet-glow {
               animation: none !important;
-              display: none;
+              left: 0%;
+              opacity: 1;
             }
           }
         `}</style>
 
-        <svg
-          width={totalW}
-          height={totalH}
-          viewBox={`0 0 ${totalW} ${totalH}`}
-          aria-label={title}
-          role="img"
-          style={{ minWidth: totalW }}
-        >
-          <defs>
-            {/* Seta padrão */}
-            <marker id={`cf-arrow-${uid}`} markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-              <polygon points="0 0, 8 3, 0 6" fill="hsl(var(--muted-foreground) / 0.5)" />
-            </marker>
-
-            {/* Glow do cometa */}
-            <filter id={`cf-glow-${uid}`} x="-200%" y="-200%" width="500%" height="500%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-
-          {/* Linha de base (trilha do cometa) */}
-          <path
-            d={cometPathD}
-            fill="none"
-            stroke="hsl(var(--border) / 0.5)"
-            strokeWidth={1}
-            strokeDasharray="3,6"
-          />
-
-          {/* Setas entre nós */}
-          {nodes.slice(0, -1).map((_, i) => {
-            const x1 = PAD + (i + 1) * NODE_W + i * ARROW_W;
-            const x2 = x1 + ARROW_W;
-            return (
-              <line
-                key={i}
-                x1={x1}
-                y1={MID_Y}
-                x2={x2 - 8}
-                y2={MID_Y}
-                stroke="hsl(var(--muted-foreground) / 0.4)"
-                strokeWidth={1.5}
-                markerEnd={`url(#cf-arrow-${uid})`}
-              />
-            );
-          })}
-
-          {/* Nós */}
-          {nodes.map((node, i) => {
-            const x = PAD + i * (NODE_W + ARROW_W);
-            const isFirst = i === 0;
-            const isLast = i === nodes.length - 1;
-
-            return (
-              <g key={i}>
-                {/* Retângulo */}
-                <rect
-                  x={x}
-                  y={PAD}
-                  width={NODE_W}
-                  height={NODE_H}
-                  rx={8}
-                  fill={isFirst || isLast ? "hsl(var(--primary) / 0.08)" : "hsl(var(--muted) / 0.7)"}
-                  stroke={isFirst || isLast ? "hsl(var(--primary) / 0.5)" : "hsl(var(--border) / 0.8)"}
-                  strokeWidth={isFirst || isLast ? 1.5 : 1}
-                />
-                {/* Label principal */}
-                <text
-                  x={x + NODE_W / 2}
-                  y={PAD + NODE_H / 2 - (node.sublabel ? 6 : 0)}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={10}
-                  fontWeight={isFirst || isLast ? 700 : 500}
-                  fontFamily="var(--font-mono)"
-                  fill={isFirst || isLast ? "hsl(var(--primary))" : "hsl(var(--foreground) / 0.85)"}
-                >
-                  {node.label}
-                </text>
-                {/* Sublabel opcional */}
-                {node.sublabel && (
-                  <text
-                    x={x + NODE_W / 2}
-                    y={PAD + NODE_H / 2 + 10}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={8}
-                    fontFamily="var(--font-mono)"
-                    fill="hsl(var(--muted-foreground) / 0.6)"
-                  >
-                    {node.sublabel}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-
-          {/* Cauda do cometa (trail) */}
-          <rect
-            className={`comet-tail2-${uid}`}
-            x={PAD - 14}
-            y={MID_Y - 2}
-            width={14}
-            height={4}
-            rx={2}
-            fill="hsl(var(--primary))"
-            opacity={0}
-            style={{ animation: `comet-tail-${uid} ${duration}s linear infinite` }}
-          />
-          <rect
-            className={`comet-tail1-${uid}`}
-            x={PAD - 8}
-            y={MID_Y - 2.5}
-            width={8}
-            height={5}
-            rx={2}
-            fill="hsl(var(--primary))"
-            opacity={0}
-            style={{
-              animation: `comet-tail-${uid} ${duration}s linear infinite`,
-              animationDelay: `${duration * 0.02}s`,
-            }}
-          />
-
-          {/* Cabeça do cometa */}
-          <circle
-            className={`comet-head-${uid}`}
-            cx={PAD}
-            cy={MID_Y}
-            r={6}
-            fill="hsl(var(--primary))"
-            filter={`url(#cf-glow-${uid})`}
-            opacity={0}
-            style={{ animation: `comet-travel-${uid} ${duration}s linear infinite` }}
-          />
-
-          {/* Label do cometa */}
-          <text
-            x={totalW / 2}
-            y={totalH - 4}
-            textAnchor="middle"
-            fontSize={8}
-            fontFamily="var(--font-mono)"
-            fill="hsl(var(--primary) / 0.6)"
+        <div className="relative overflow-hidden rounded-2xl border border-primary/15 bg-linear-to-r from-primary/6 via-background to-background px-4 py-4 sm:px-5">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-4 top-1/2 hidden -translate-y-1/2 md:block"
           >
-            ☄ {cometLabel}
-          </text>
-        </svg>
+            <div className="relative h-px bg-transparent">
+              <div className="absolute inset-x-0 top-0 border-t border-dashed border-border/70" />
+              <div
+                className={cn(
+                  "absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_70%,transparent)]",
+                  `${uid}-comet`,
+                )}
+                style={{ animation: `${cometAnim} ${duration}s linear infinite` }}
+              />
+              <div
+                className={cn(
+                  "absolute top-1/2 h-1.5 w-7 -translate-y-1/2 rounded-full bg-linear-to-r from-primary/0 via-primary/45 to-primary/80 blur-[1px]",
+                  `${uid}-comet-glow`,
+                )}
+                style={{ animation: `${cometGlowAnim} ${duration}s linear infinite` }}
+              />
+            </div>
+          </div>
+
+          <div className="relative flex items-center justify-between gap-3">
+            <div>
+              <div className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-primary/75">
+                fluxo da requisição
+              </div>
+              <div className="mt-1 text-sm text-foreground/80">
+                HTTP entra, o service orquestra o negócio, o repository persiste.
+              </div>
+            </div>
+            <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-primary">
+              {cometLabel}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-2">
+            {nodes.map((node, index) => {
+              const kind = getNodeKind(node.label, index, nodes.length);
+              const tone = getNodeTone(kind);
+              const Icon = getNodeIcon(node.label, index, nodes.length);
+              const isLast = index === nodes.length - 1;
+
+              return (
+                <div
+                  key={`${node.label}-${index}`}
+                  className="flex flex-col md:min-w-0 md:flex-1 md:flex-row md:items-center"
+                >
+                  <article
+                    className={cn(
+                      "relative min-w-0 rounded-2xl border px-4 py-4 transition-shadow",
+                      tone.card,
+                      kind === "service" ? "md:-translate-y-1" : "",
+                    )}
+                    style={node.color ? { borderColor: node.color } : undefined}
+                  >
+                    <div
+                      aria-hidden="true"
+                      className={cn(
+                        "mb-3 flex size-10 items-center justify-center rounded-xl border",
+                        tone.badge,
+                      )}
+                      style={node.color ? { color: node.color, borderColor: node.color } : undefined}
+                    >
+                      <Icon className="size-4" />
+                    </div>
+
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div
+                          className={cn("text-sm font-semibold tracking-tight sm:text-[0.95rem]", tone.title)}
+                          style={node.color ? { color: node.color } : undefined}
+                        >
+                          {node.label}
+                        </div>
+                        {node.sublabel ? (
+                          <div className={cn("mt-1 text-xs leading-5 sm:text-[0.8rem]", tone.sublabel)}>
+                            {node.sublabel}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="flex shrink-0 flex-col items-center gap-1">
+                        <div className={cn("size-2.5 rounded-full", tone.dot)} />
+                        <span className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-muted-foreground/70">
+                          {index + 1}
+                        </span>
+                      </div>
+                    </div>
+
+                    {kind === "service" ? (
+                      <div className="mt-3 inline-flex rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-primary">
+                        centro da regra de negócio
+                      </div>
+                    ) : null}
+                  </article>
+
+                  {!isLast ? (
+                    <>
+                      <div className="flex justify-center py-1.5 md:hidden">
+                        <div className="flex flex-col items-center gap-1 text-muted-foreground/70">
+                          <div className={cn("h-6 w-px", tone.connector)} />
+                          <ArrowDown className="size-3.5" />
+                        </div>
+                      </div>
+                      <div className="hidden md:flex md:w-8 md:shrink-0 md:items-center md:justify-center">
+                        <div className="flex w-full items-center gap-1.5 text-muted-foreground/70">
+                          <div className={cn("h-px flex-1", tone.connector)} />
+                          <ArrowRight className="size-3.5 shrink-0" />
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

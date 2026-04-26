@@ -27,6 +27,11 @@ const NODE_H = 40;
 const H_GAP = 60;
 const V_GAP = 60;
 const PADDING = 24;
+const COLOR_PRIMARY = "var(--primary)";
+const COLOR_FOREGROUND = "var(--foreground)";
+const COLOR_MUTED = "var(--muted)";
+const COLOR_MUTED_FOREGROUND = "var(--muted-foreground)";
+const COLOR_BORDER = "var(--border)";
 
 type LayoutNode = NodeDef & { x: number; y: number };
 
@@ -91,21 +96,36 @@ function autoLayout(nodes: NodeDef[], edges: EdgeDef[]): LayoutNode[] {
   }));
 }
 
-const TYPE_STYLES: Record<string, { fill: string; stroke: string; text: string }> = {
+const TYPE_STYLES: Record<
+  string,
+  {
+    fill: string;
+    fillOpacity?: number;
+    stroke: string;
+    strokeOpacity?: number;
+    text: string;
+    textOpacity?: number;
+  }
+> = {
   primary: {
-    fill: "hsl(var(--primary) / 0.15)",
-    stroke: "hsl(var(--primary) / 0.8)",
-    text: "hsl(var(--primary))",
+    fill: COLOR_PRIMARY,
+    fillOpacity: 0.15,
+    stroke: COLOR_PRIMARY,
+    strokeOpacity: 0.8,
+    text: COLOR_PRIMARY,
   },
   secondary: {
-    fill: "hsl(var(--muted))",
-    stroke: "hsl(var(--border))",
-    text: "hsl(var(--foreground) / 0.8)",
+    fill: COLOR_MUTED,
+    stroke: COLOR_BORDER,
+    text: COLOR_FOREGROUND,
+    textOpacity: 0.8,
   },
   external: {
-    fill: "hsl(var(--muted) / 0.5)",
-    stroke: "hsl(var(--border) / 0.6)",
-    text: "hsl(var(--muted-foreground))",
+    fill: COLOR_MUTED,
+    fillOpacity: 0.5,
+    stroke: COLOR_BORDER,
+    strokeOpacity: 0.6,
+    text: COLOR_MUTED_FOREGROUND,
   },
 };
 
@@ -161,7 +181,8 @@ export function DepVisualizer({ nodes, edges, title = "Visualizador de Dependên
             >
               <polygon
                 points="0 0, 8 3, 0 6"
-                fill="hsl(var(--muted-foreground) / 0.5)"
+                fill={COLOR_MUTED_FOREGROUND}
+                fillOpacity={0.5}
               />
             </marker>
             <marker
@@ -174,7 +195,7 @@ export function DepVisualizer({ nodes, edges, title = "Visualizador de Dependên
             >
               <polygon
                 points="0 0, 8 3, 0 6"
-                fill="hsl(var(--primary))"
+                fill={COLOR_PRIMARY}
               />
             </marker>
           </defs>
@@ -197,11 +218,8 @@ export function DepVisualizer({ nodes, edges, title = "Visualizador de Dependên
                 <path
                   d={`M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`}
                   fill="none"
-                  stroke={
-                    isActive
-                      ? "hsl(var(--primary))"
-                      : "hsl(var(--muted-foreground) / 0.4)"
-                  }
+                  stroke={isActive ? COLOR_PRIMARY : COLOR_MUTED_FOREGROUND}
+                  strokeOpacity={isActive ? undefined : 0.4}
                   strokeWidth={isActive ? 2 : 1.5}
                   strokeDasharray={edge.dashed ? "5,3" : undefined}
                   markerEnd={
@@ -215,7 +233,7 @@ export function DepVisualizer({ nodes, edges, title = "Visualizador de Dependên
                     y={(y1 + y2) / 2 - 4}
                     textAnchor="middle"
                     fontSize={9}
-                    fill="hsl(var(--muted-foreground))"
+                    fill={COLOR_MUTED_FOREGROUND}
                     className="font-mono"
                   >
                     {edge.label}
@@ -244,7 +262,9 @@ export function DepVisualizer({ nodes, edges, title = "Visualizador de Dependên
                   height={NODE_H}
                   rx={8}
                   fill={style.fill}
-                  stroke={hovered === node.id ? "hsl(var(--primary))" : style.stroke}
+                  fillOpacity={style.fillOpacity}
+                  stroke={hovered === node.id ? COLOR_PRIMARY : style.stroke}
+                  strokeOpacity={hovered === node.id ? undefined : style.strokeOpacity}
                   strokeWidth={hovered === node.id ? 2 : 1.5}
                   style={{ transition: "stroke 0.15s" }}
                 />
@@ -256,6 +276,7 @@ export function DepVisualizer({ nodes, edges, title = "Visualizador de Dependên
                   fontSize={11}
                   fontWeight={node.type === "primary" ? "700" : "500"}
                   fill={style.text}
+                  fillOpacity={style.textOpacity}
                   fontFamily="var(--font-mono)"
                 >
                   {node.label}

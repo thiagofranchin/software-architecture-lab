@@ -6,6 +6,7 @@ import { Callout } from "@/components/content/callout";
 import { DecisionCard } from "@/components/content/decision-card";
 import { DepVisualizer } from "@/components/content/dep-visualizer";
 import { Diagram } from "@/components/content/diagram";
+import { ProcessStep, ProcessSteps } from "@/components/content/process-steps";
 import { TradeoffTable } from "@/components/content/tradeoff-table";
 import { CategoryBadge } from "@/components/content/category-badge";
 import {
@@ -157,6 +158,8 @@ export const mdxComponents = {
   DepVisualizer,
   Diagram,
   OrbitDiagram,
+  ProcessStep,
+  ProcessSteps,
   TradeoffTable,
   CodeBad,
   CodeGood,
