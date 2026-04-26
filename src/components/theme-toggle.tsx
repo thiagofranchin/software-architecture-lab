@@ -1,45 +1,80 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Theme = "light" | "dark";
+
+type ThemeToggleProps = {
+  className?: string;
+  variant?: "default" | "compact";
+};
+
+const STORAGE_KEY = "theme";
 
 function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
-export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme | null>(null);
+function readTheme(): Theme {
+  if (typeof window === "undefined") return "light";
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
 
-  useEffect(() => {
-    const storedTheme = window.localStorage.getItem("theme");
-    const preferredTheme =
-      storedTheme === "light" || storedTheme === "dark"
-        ? storedTheme
-        : window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
+function subscribe(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
 
-    applyTheme(preferredTheme);
-    setTheme(preferredTheme);
-  }, []);
+export function ThemeToggle({
+  className,
+  variant = "default",
+}: ThemeToggleProps = {}) {
+  const theme = useSyncExternalStore(
+    subscribe,
+    readTheme,
+    () => "light" as Theme,
+  );
 
   function toggleTheme() {
-    const nextTheme = theme === "dark" ? "light" : "dark";
+    const nextTheme: Theme = theme === "dark" ? "light" : "dark";
     applyTheme(nextTheme);
-    window.localStorage.setItem("theme", nextTheme);
-    setTheme(nextTheme);
+    window.localStorage.setItem(STORAGE_KEY, nextTheme);
+    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
   }
 
   const isDark = theme === "dark";
 
+  if (variant === "compact") {
+    return (
+      <Button
+        aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
+        className={cn("rounded-full", className)}
+        onClick={toggleTheme}
+        size="icon-sm"
+        type="button"
+        variant="ghost"
+      >
+        {isDark ? <Sun /> : <Moon />}
+      </Button>
+    );
+  }
+
   return (
     <Button
       aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
-      className="rounded-full border border-border/70 bg-card/80 px-4 text-card-foreground shadow-md backdrop-blur-sm"
+      className={cn(
+        "rounded-full border border-border/70 bg-card/80 px-4 text-card-foreground shadow-md backdrop-blur-sm",
+        className,
+      )}
       onClick={toggleTheme}
       size="sm"
       type="button"

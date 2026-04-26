@@ -1,0 +1,129 @@
+---
+title: "Separação de Responsabilidades"
+slug: "separacao-de-responsabilidades"
+description: "Entenda como dividir o sistema em partes com funções claras para reduzir acoplamento, melhorar testabilidade e tornar a manutenção sustentável."
+category: "Fundamentos"
+level: "Iniciante"
+duration: "12 min"
+tags:
+  - arquitetura
+  - clean-code
+  - frontend
+  - backend
+related:
+  - acoplamento
+published: true
+---
+
+## Resumo
+
+**Separação de responsabilidades** é o princípio de dividir o sistema em partes com funções claras, onde cada parte sabe fazer uma coisa bem feita e ignora o resto.
+
+Ele não é sobre criar muitas pastas — é sobre **quem decide o quê** dentro de uma aplicação. Quando esse contrato é quebrado, o código fica difícil de testar, frágil para mudar e doloroso para entender.
+
+## Problema que resolve
+
+Sem separação, componentes acumulam papéis: renderizar, validar, chamar API, transformar dados, aplicar regra de negócio e tratar erros. Cada um desses papéis muda por motivos diferentes, em momentos diferentes — e quando estão juntos, qualquer alteração quebra alguma das outras.
+
+A separação responde a uma pergunta poderosa: **"se isso aqui mudar, o que mais precisa mudar junto?"**. Quanto menor a resposta, mais saudável o código.
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Tudo no componente">
+
+```tsx
+function PropostaForm() {
+  const [docs, setDocs] = useState([]);
+  const [erro, setErro] = useState("");
+
+  async function enviar() {
+    if (docs.length < 3) {
+      setErro("Faltam documentos");
+      return;
+    }
+    const res = await fetch("/api/propostas", {
+      method: "POST",
+      body: JSON.stringify({ docs }),
+    });
+    if (!res.ok) setErro("Falha ao enviar");
+  }
+
+  return <button onClick={enviar}>Enviar</button>;
+}
+```
+
+</CodeBad>
+<CodeGood title="Cada coisa no seu lugar">
+
+```tsx
+function PropostaForm() {
+  const { enviar, erro } = useEnviarProposta();
+  return <button onClick={enviar}>Enviar</button>;
+}
+
+// hook: orquestra o fluxo
+function useEnviarProposta() { /* ... */ }
+
+// use case: regra de negócio
+function podeEnviar(proposta) { /* ... */ }
+
+// service: comunicação externa
+function postProposta(payload) { /* ... */ }
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando aplicar
+
+- Sempre que uma função, componente ou módulo cresce além de **uma frase para ser explicado**.
+- Antes de duplicar lógica em outro lugar — extrair primeiro evita divergências.
+- Quando um teste exige montar muitos mocks só para testar uma coisa pequena.
+
+<Callout variant="sucesso" title="Boa prática">
+Pergunte sempre: **"esta função muda por quantos motivos diferentes?"**. Se a resposta for mais do que um, há separação a fazer.
+</Callout>
+
+## Quando não exagerar
+
+Não toda função pequena precisa virar uma camada. Em features triviais (uma tela de listagem simples, por exemplo), criar service + use case + mapper só por princípio gera mais ruído do que valor.
+
+<Callout variant="atencao" title="Cuidado com over-engineering">
+Abstrair cedo demais é tão ruim quanto não abstrair nunca. Espere a segunda ou terceira repetição antes de extrair um padrão — o código mostra a forma natural com o tempo.
+</Callout>
+
+## Erros comuns
+
+- Criar pastas chamadas `services/`, `helpers/` e `utils/` sem critério, e enfiar tudo dentro.
+- Separar arquivos sem separar **responsabilidades reais**: dois arquivos que sempre mudam juntos não estão separados de verdade.
+- Colocar regras de negócio dentro de componentes de UI ou handlers HTTP.
+- Misturar validação de formulário (entrada do usuário) com regra de domínio (regra do negócio).
+
+<Callout variant="erro" title="Antipattern frequente">
+Componente que faz `fetch` direto, valida o formulário com `if`, transforma a resposta e ainda decide se o usuário pode prosseguir. Tudo isso são quatro responsabilidades diferentes.
+</Callout>
+
+## Exercício
+
+Leia este componente mentalmente e responda: **quantos motivos para mudança ele tem hoje?**
+
+```tsx
+function CheckoutButton({ usuario, carrinho }) {
+  async function pagar() {
+    if (!usuario.email) return alert("Faça login");
+    if (carrinho.total > usuario.limite) return alert("Limite excedido");
+    const res = await fetch("/api/pagar", { method: "POST" });
+    if (res.ok) window.location.href = "/obrigado";
+  }
+  return <button onClick={pagar}>Pagar</button>;
+}
+```
+
+Sugestão: liste pelo menos quatro motivos diferentes pelos quais este código pode precisar mudar no futuro.
+
+## Conceitos relacionados
+
+- [Acoplamento](/conceitos/acoplamento) — métrica direta do quanto suas partes se conhecem.
+- Coesão — métrica do quanto cada parte é internamente consistente.
+- Camadas — a forma mais comum de organizar a separação em escala.

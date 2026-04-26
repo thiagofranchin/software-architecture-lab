@@ -1,0 +1,75 @@
+---
+title: "Acoplamento"
+slug: "acoplamento"
+description: "Acoplamento mede o quanto dois módulos dependem um do outro. Quanto mais alto, mais difícil mudar um sem quebrar o outro."
+category: "Fundamentos"
+level: "Iniciante"
+duration: "8 min"
+tags:
+  - arquitetura
+  - dependencias
+related:
+  - separacao-de-responsabilidades
+published: true
+---
+
+## Resumo
+
+**Acoplamento** é a medida de **quanta informação um módulo precisa ter sobre outro** para funcionar. Quanto mais íntima essa dependência, maior o acoplamento — e maior o risco de uma mudança em A quebrar B sem aviso.
+
+Acoplamento alto não é necessariamente ruim: é ruim quando esconde-se onde você não esperava. Sistemas saudáveis tornam o acoplamento **explícito** e o concentram em pontos controlados (interfaces, contratos, fronteiras).
+
+## Problema que resolve
+
+Sem atenção ao acoplamento, o sistema vira um emaranhado: trocar um banco de dados exige mexer em controllers, mudar o formato de uma resposta de API obriga a alterar o componente que a usa, atualizar uma biblioteca quebra dezenas de arquivos. Cada decisão fica cara porque "tudo está conectado a tudo".
+
+## Exemplo simples
+
+<CompareGrid>
+<CodeBad title="Componente conhece o fetch">
+
+```tsx
+function ListaUsuarios() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    fetch("/api/users")
+      .then(r => r.json())
+      .then(setUsers);
+  }, []);
+  return users.map(u => <p key={u.id}>{u.nome}</p>);
+}
+```
+
+</CodeBad>
+<CodeGood title="Componente recebe o que precisa">
+
+```tsx
+function ListaUsuarios({ users }) {
+  return users.map(u => (
+    <p key={u.id}>{u.nome}</p>
+  ));
+}
+
+// quem chama injeta os dados:
+const users = await getUsers();
+<ListaUsuarios users={users} />
+```
+
+</CodeGood>
+</CompareGrid>
+
+No primeiro caso, o componente está acoplado **à fonte dos dados** (sabe que vem do `/api/users`, sabe que é JSON). No segundo, ele só sabe **renderizar** — quem busca e como busca é problema de outro lugar.
+
+## Sinais de acoplamento alto
+
+- Pequenas mudanças exigem editar muitos arquivos não relacionados aparentemente.
+- Testar uma parte exige montar quase o sistema inteiro.
+- Você teme atualizar uma dependência porque "vai quebrar tudo".
+
+<Callout variant="atencao" title="Trade-off">
+Reduzir acoplamento custa indireção. Cada nova interface, injeção ou abstração adiciona uma camada para o leitor entender. Vale a pena onde a mudança é frequente; é exagero onde nada nunca muda.
+</Callout>
+
+## Conceitos relacionados
+
+- [Separação de Responsabilidades](/conceitos/separacao-de-responsabilidades) — pré-requisito para baixar acoplamento sem virar caos.

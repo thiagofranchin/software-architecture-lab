@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Software Architecture Lab
 
-## Getting Started
+> Site publicado: **[https://sal-lab.vercel.app/](https://sal-lab.vercel.app/)**
 
-First, run the development server:
+Laboratório visual e prático para aprender arquitetura de software, voltado a desenvolvedores frontend, backend e fullstack. Combina trilhas progressivas, conceitos catalogados, exemplos comparativos (antipattern × recomendado) e um glossário de referência.
+
+## Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS v4** com paleta `sunset-horizon` em OKLCH
+- **Base UI** + componentes shadcn (estilo `base-nova`)
+- **MDX** via `next-mdx-remote/rsc` para conteúdo educacional
+- **Lucide** para ícones
+- Deploy contínuo na **Vercel**
+
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev     # dev server em http://localhost:3000
+npm run build   # build de produção
+npm start       # serve a build
+npm run lint    # ESLint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estrutura
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── app/                  # rotas (Home, /trilhas, /conceitos, /glossario, /sobre, /roadmap)
+├── components/
+│   ├── layout/           # SiteHeader, SiteFooter, PageContainer
+│   ├── content/          # CategoryBadge, Callout, CodeComparison, TrilhaCard, ConceptCard, ...
+│   ├── mdx/              # mapeamento HTML → componentes e renderizador MDX
+│   └── ui/               # primitivos (Button)
+├── content/              # arquivos .mdx das trilhas, conceitos e glossário
+├── lib/content/          # leitura e parsing de frontmatter (gray-matter + type guards)
+├── types/content.ts      # tipos compartilhados (Trilha, Conceito, Categoria, Level)
+└── app/globals.css       # tokens OKLCH e tokens de categoria
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Conteúdo
 
-## Learn More
+Os arquivos MDX vivem em `src/content/<tipo>/<slug>.mdx`. Cada um exige o frontmatter:
 
-To learn more about Next.js, take a look at the following resources:
+```yaml
+---
+title: "Separação de Responsabilidades"
+slug: "separacao-de-responsabilidades"
+description: "..."
+category: "Fundamentos"        # Fundamentos | Frontend | Backend | Patterns | Prática
+level: "Iniciante"             # Iniciante | Intermediário | Avançado
+duration: "12 min"
+tags: [arquitetura, clean-code]
+related: [acoplamento]         # slugs de conceitos relacionados
+published: true
+---
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Componentes disponíveis dentro do MDX: `<CategoryBadge>`, `<Callout>` (variantes `info` / `atencao` / `erro` / `sucesso`), `<CodeComparison>`, `<ConceptCard>`, `<TrilhaCard>`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tema
 
-## Deploy on Vercel
+Modo claro/escuro persistente via `localStorage` e sincronizado com `prefers-color-scheme`. A inicialização acontece em script `beforeInteractive` no [src/app/layout.tsx](src/app/layout.tsx) para evitar flash. A alternância usa `useSyncExternalStore` em [src/components/theme-toggle.tsx](src/components/theme-toggle.tsx).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A paleta é monocromática quente — primary (coral), accent (dourado), tokens semânticos por categoria. Todas as cores em OKLCH, definidas em [src/app/globals.css](src/app/globals.css).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Roadmap
+
+Veja [/roadmap](https://sal-lab.vercel.app/roadmap) no site para o caminho completo. Esta versão entrega Fases 1 e 2 (fundação técnica + conteúdo inicial). As próximas fases incluem diagramas Mermaid, playground interativo, expansão de trilhas e, futuramente, plataforma com autenticação e busca semântica.

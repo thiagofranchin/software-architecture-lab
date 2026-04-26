@@ -70,6 +70,20 @@
   --shadow-opacity: var(--shadow-opacity);
   --color-shadow-color: var(--shadow-color);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-category-fundamentos: var(--category-fundamentos);
+  --color-category-fundamentos-foreground: var(--category-fundamentos-foreground);
+  --color-category-frontend: var(--category-frontend);
+  --color-category-frontend-foreground: var(--category-frontend-foreground);
+  --color-category-backend: var(--category-backend);
+  --color-category-backend-foreground: var(--category-backend-foreground);
+  --color-category-patterns: var(--category-patterns);
+  --color-category-patterns-foreground: var(--category-patterns-foreground);
+  --color-category-pratica: var(--category-pratica);
+  --color-category-pratica-foreground: var(--category-pratica-foreground);
+  --color-category-alerta: var(--category-alerta);
+  --color-category-alerta-foreground: var(--category-alerta-foreground);
+  --color-category-erro: var(--category-erro);
+  --color-category-erro-foreground: var(--category-erro-foreground);
 }
 
 :root {
@@ -123,6 +137,20 @@
   --shadow-xl: 0px 6px 12px -3px hsl(0 0% 0% / 0.09), 0px 8px 10px -4px hsl(0 0% 0% / 0.09);
   --shadow-2xl: 0px 6px 12px -3px hsl(0 0% 0% / 0.22);
   --tracking-normal: 0em;
+  --category-fundamentos: oklch(0.7357 0.1641 34.7091);
+  --category-fundamentos-foreground: oklch(1.0000 0 0);
+  --category-frontend: oklch(0.8278 0.1131 57.9984);
+  --category-frontend-foreground: oklch(0.3353 0.0132 2.7676);
+  --category-backend: oklch(0.6368 0.1306 32.0721);
+  --category-backend-foreground: oklch(1.0000 0 0);
+  --category-patterns: oklch(0.8773 0.0763 54.9314);
+  --category-patterns-foreground: oklch(0.3353 0.0132 2.7676);
+  --category-pratica: oklch(0.5800 0.1100 70.0000);
+  --category-pratica-foreground: oklch(1.0000 0 0);
+  --category-alerta: oklch(0.8200 0.1054 40.8859);
+  --category-alerta-foreground: oklch(0.3353 0.0132 2.7676);
+  --category-erro: oklch(0.6122 0.2082 22.2410);
+  --category-erro-foreground: oklch(1.0000 0 0);
 }
 
 .dark {
@@ -175,6 +203,20 @@
   --shadow-lg: 0px 6px 12px -3px hsl(0 0% 0% / 0.09), 0px 4px 6px -4px hsl(0 0% 0% / 0.09);
   --shadow-xl: 0px 6px 12px -3px hsl(0 0% 0% / 0.09), 0px 8px 10px -4px hsl(0 0% 0% / 0.09);
   --shadow-2xl: 0px 6px 12px -3px hsl(0 0% 0% / 0.22);
+  --category-fundamentos: oklch(0.7357 0.1641 34.7091);
+  --category-fundamentos-foreground: oklch(1.0000 0 0);
+  --category-frontend: oklch(0.8278 0.1131 57.9984);
+  --category-frontend-foreground: oklch(0.2569 0.0169 352.4042);
+  --category-backend: oklch(0.6368 0.1306 32.0721);
+  --category-backend-foreground: oklch(1.0000 0 0);
+  --category-patterns: oklch(0.8773 0.0763 54.9314);
+  --category-patterns-foreground: oklch(0.2569 0.0169 352.4042);
+  --category-pratica: oklch(0.7000 0.1100 70.0000);
+  --category-pratica-foreground: oklch(0.2569 0.0169 352.4042);
+  --category-alerta: oklch(0.8200 0.1054 40.8859);
+  --category-alerta-foreground: oklch(0.2569 0.0169 352.4042);
+  --category-erro: oklch(0.6122 0.2082 22.2410);
+  --category-erro-foreground: oklch(1.0000 0 0);
 }
 
 @layer base {
