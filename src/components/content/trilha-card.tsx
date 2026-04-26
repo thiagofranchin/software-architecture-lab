@@ -13,6 +13,7 @@ type TrilhaCardProps = {
   level: Level;
   duration?: string;
   tags?: string[];
+  order?: number;
   className?: string;
 };
 
@@ -24,6 +25,7 @@ export function TrilhaCard({
   level,
   duration,
   tags,
+  order,
   className,
 }: TrilhaCardProps) {
   return (
@@ -40,7 +42,12 @@ export function TrilhaCard({
       />
       <div className="flex items-center justify-between gap-2 pt-1">
         <CategoryBadge category={category} tone="soft" />
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          {order != null && (
+            <span className="font-mono font-semibold text-primary">
+              {String(order).padStart(2, "0")}
+            </span>
+          )}
           <Layers aria-hidden="true" className="size-3.5" />
           Trilha
         </span>

@@ -22,6 +22,7 @@ export type ContentFrontmatter = {
   tags: string[];
   related: string[];
   published: boolean;
+  order?: number;
 };
 
 export type ContentItem = ContentFrontmatter & {

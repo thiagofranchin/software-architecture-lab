@@ -69,6 +69,7 @@ export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
               category={item.category}
               level={item.level}
               duration={item.duration}
+              order={item.order}
             />
           ))}
         </div>

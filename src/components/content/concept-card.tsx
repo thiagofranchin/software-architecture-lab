@@ -12,6 +12,7 @@ type ConceptCardProps = {
   category: Category;
   level: Level;
   duration?: string;
+  order?: number;
   className?: string;
 };
 
@@ -22,6 +23,7 @@ export function ConceptCard({
   category,
   level,
   duration,
+  order,
   className,
 }: ConceptCardProps) {
   return (
@@ -34,10 +36,17 @@ export function ConceptCard({
     >
       <div className="flex items-center justify-between gap-2">
         <CategoryBadge category={category} tone="soft" size="sm" />
-        <ArrowUpRight
-          aria-hidden="true"
-          className="size-4 text-muted-foreground transition group-hover:text-primary"
-        />
+        <div className="flex items-center gap-1.5">
+          {order != null && (
+            <span className="font-mono text-xs font-semibold text-primary">
+              {String(order).padStart(2, "0")}
+            </span>
+          )}
+          <ArrowUpRight
+            aria-hidden="true"
+            className="size-4 text-muted-foreground transition group-hover:text-primary"
+          />
+        </div>
       </div>
       <h3 className="font-serif text-lg font-bold tracking-tight text-foreground">
         {title}
