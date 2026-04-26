@@ -6,8 +6,16 @@ import { notFound } from "next/navigation";
 import { CategoryBadge } from "@/components/content/category-badge";
 import { RelatedContent } from "@/components/content/related-content";
 import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { MdxContent } from "@/components/mdx/mdx-content";
 import { getAllTrilhas, getTrilhaBySlug } from "@/lib/content/loader";
+import {
+  buildMetadata,
+  schemaBreadcrumb,
+  schemaCourse,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
 
 type Params = { slug: string };
 
@@ -24,15 +32,20 @@ export async function generateMetadata({
   const { slug } = await params;
   const trilha = await getTrilhaBySlug(slug);
   if (!trilha) return { title: "Trilha não encontrada" };
-  return {
-    title: trilha.title,
+
+  return buildMetadata({
+    title: `${trilha.title} — Trilha`,
     description: trilha.description,
-    openGraph: {
-      title: trilha.title,
-      description: trilha.description,
-      type: "article",
-    },
-  };
+    path: `/trilhas/${slug}`,
+    keywords: [
+      ...trilha.tags,
+      `trilha ${trilha.category.toLowerCase()}`,
+      `${trilha.level.toLowerCase()} arquitetura de software`,
+      `aprender ${trilha.title.toLowerCase()}`,
+    ],
+    type: "article",
+    tags: trilha.tags,
+  });
 }
 
 export default async function TrilhaPage({
@@ -44,8 +57,25 @@ export default async function TrilhaPage({
   const trilha = await getTrilhaBySlug(slug);
   if (!trilha) notFound();
 
+  const jsonLd = [
+    schemaCourse({
+      title: trilha.title,
+      description: trilha.description,
+      slug,
+      level: trilha.level,
+      tags: trilha.tags,
+    }),
+    schemaBreadcrumb([
+      { name: "Home", url: SITE_URL },
+      { name: "Trilhas", url: `${SITE_URL}/trilhas` },
+      { name: trilha.title, url: `${SITE_URL}/trilhas/${slug}` },
+    ]),
+  ];
+
   return (
     <PageContainer size="narrow" className="py-12">
+      <JsonLd schema={jsonLd} />
+
       <Link
         href="/trilhas"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground"

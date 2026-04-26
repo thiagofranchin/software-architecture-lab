@@ -5,12 +5,24 @@ import type { Metadata } from "next";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { MdxContent } from "@/components/mdx/mdx-content";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Glossário",
+export const metadata: Metadata = buildMetadata({
+  title: "Glossário de Arquitetura de Software",
   description:
-    "Glossário de termos chave em arquitetura de software: acoplamento, coesão, use case, repository, DTO, schema e mais.",
-};
+    "Glossário completo de termos de arquitetura de software: acoplamento, coesão, use case, repository pattern, DTO, schema, domain model, clean architecture, SOLID e mais. Definições curtas e objetivas com âncoras para referência.",
+  path: "/glossario",
+  keywords: [
+    "glossário arquitetura software",
+    "o que é acoplamento",
+    "o que é coesão",
+    "o que é use case",
+    "o que é repository pattern",
+    "o que é DTO",
+    "SOLID princípios",
+    "termos arquitetura software",
+  ],
+});
 
 async function readGlossario() {
   const filePath = path.join(

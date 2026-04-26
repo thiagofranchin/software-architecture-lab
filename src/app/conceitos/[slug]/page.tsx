@@ -7,6 +7,7 @@ import { CategoryBadge } from "@/components/content/category-badge";
 import { PrevNextNav } from "@/components/content/prev-next-nav";
 import { RelatedContent } from "@/components/content/related-content";
 import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { MdxContent } from "@/components/mdx/mdx-content";
 import {
   getAllConceitos,
@@ -14,6 +15,12 @@ import {
   getConceitosInTrilha,
   getTrilhaForConceito,
 } from "@/lib/content/loader";
+import {
+  buildMetadata,
+  schemaArticle,
+  schemaBreadcrumb,
+  SITE_URL,
+} from "@/lib/seo";
 
 type Params = { slug: string };
 
@@ -30,15 +37,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const conceito = await getConceitoBySlug(slug);
   if (!conceito) return { title: "Conceito não encontrado" };
-  return {
+
+  return buildMetadata({
     title: conceito.title,
     description: conceito.description,
-    openGraph: {
-      title: conceito.title,
-      description: conceito.description,
-      type: "article",
-    },
-  };
+    path: `/conceitos/${slug}`,
+    keywords: [
+      ...conceito.tags,
+      `${conceito.title.toLowerCase()} arquitetura`,
+      `o que é ${conceito.title.toLowerCase()}`,
+      `como usar ${conceito.title.toLowerCase()}`,
+      conceito.category.toLowerCase(),
+      conceito.level.toLowerCase(),
+    ],
+    type: "article",
+    tags: conceito.tags,
+  });
 }
 
 export default async function ConceitoPage({
@@ -61,8 +75,29 @@ export default async function ConceitoPage({
       ? conceitosNaTrilha[posicao + 1]
       : null;
 
+  const breadcrumbItems = [
+    { name: "Home", url: SITE_URL },
+    { name: "Conceitos", url: `${SITE_URL}/conceitos` },
+    ...(trilha
+      ? [{ name: trilha.title, url: `${SITE_URL}/trilhas/${trilha.slug}` }]
+      : []),
+    { name: conceito.title, url: `${SITE_URL}/conceitos/${slug}` },
+  ];
+
+  const jsonLd = [
+    schemaArticle({
+      title: conceito.title,
+      description: conceito.description,
+      slug,
+      tags: conceito.tags,
+    }),
+    schemaBreadcrumb(breadcrumbItems),
+  ];
+
   return (
     <PageContainer size="narrow" className="py-12">
+      <JsonLd schema={jsonLd} />
+
       <Link
         href="/conceitos"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground"

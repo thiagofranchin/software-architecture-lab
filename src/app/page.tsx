@@ -7,13 +7,37 @@ import {
   Network,
   PencilRuler,
 } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { PageContainer } from "@/components/layout/page-container";
 import { TrilhaCard } from "@/components/content/trilha-card";
+import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { cn } from "@/lib/utils";
 import { getAllTrilhas } from "@/lib/content/loader";
+import {
+  buildMetadata,
+  schemaOrganization,
+  schemaWebSite,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
+import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = buildMetadata({
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  path: "",
+  keywords: [
+    "trilhas de arquitetura de software",
+    "aprender clean architecture",
+    "design patterns exemplos",
+    "curso arquitetura software gratuito",
+    "arquitetura frontend React",
+    "arquitetura backend Node.js",
+  ],
+});
 
 const learningTopics = [
   {
@@ -92,6 +116,7 @@ export default async function Home() {
 
   return (
     <>
+      <JsonLd schema={[schemaWebSite(), schemaOrganization()]} />
       <section className="relative overflow-hidden">
         <div
           aria-hidden="true"

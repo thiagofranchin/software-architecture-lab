@@ -6,6 +6,13 @@ import {
 } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import {
+  OG_IMAGE_URL,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
 
 import "./globals.css";
 
@@ -29,43 +36,57 @@ const fontMono = Ubuntu_Mono({
   weight: ["400", "700"],
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://sal-lab.vercel.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Software Architecture Lab",
-    template: "%s · Software Architecture Lab",
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Laboratório visual e prático para aprender arquitetura de software, com trilhas, conceitos, exemplos e estudos de caso.",
-  applicationName: "Software Architecture Lab",
-  keywords: [
-    "arquitetura de software",
-    "clean architecture",
-    "design patterns",
-    "frontend",
-    "backend",
-    "Next.js",
-    "React",
-    "Node.js",
-    "TypeScript",
-  ],
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: SITE_KEYWORDS,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "education",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
-    title: "Software Architecture Lab",
-    description:
-      "Aprenda arquitetura de software de forma visual, progressiva e prática.",
-    url: siteUrl,
-    siteName: "Software Architecture Lab",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "pt_BR",
     type: "website",
+    images: [
+      {
+        url: OG_IMAGE_URL,
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} — Aprenda arquitetura de software de forma visual e prática`,
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Software Architecture Lab",
-    description:
-      "Aprenda arquitetura de software de forma visual, progressiva e prática.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE_URL],
+    site: "@SoftArchLab",
+    creator: "@SoftArchLab",
   },
 };
 

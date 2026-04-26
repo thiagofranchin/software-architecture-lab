@@ -2,13 +2,20 @@ import { CheckCircle2, Circle, CircleDashed } from "lucide-react";
 import type { Metadata } from "next";
 
 import { PageContainer } from "@/components/layout/page-container";
+import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Roadmap",
+export const metadata: Metadata = buildMetadata({
+  title: "Roadmap — Software Architecture Lab",
   description:
-    "Roadmap em fases do Software Architecture Lab: do que já foi entregue ao que vem a seguir.",
-};
+    "Roadmap público do Software Architecture Lab em fases: fundação técnica, conteúdo inicial, recursos visuais, interatividade, expansão e plataforma completa. Veja o que já foi entregue e o que vem a seguir.",
+  path: "/roadmap",
+  keywords: [
+    "roadmap software architecture lab",
+    "fases desenvolvimento plataforma",
+    "o que vem a seguir sal-lab",
+  ],
+});
 
 type Status = "done" | "in_progress" | "planned";
 

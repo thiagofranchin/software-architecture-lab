@@ -3,12 +3,22 @@ import type { Metadata } from "next";
 import { TrilhasFilter } from "@/components/content/trilhas-filter";
 import { PageContainer } from "@/components/layout/page-container";
 import { getAllTrilhas } from "@/lib/content/loader";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Trilhas",
+export const metadata: Metadata = buildMetadata({
+  title: "Trilhas de Arquitetura de Software",
   description:
-    "Trilhas de aprendizado em arquitetura de software, organizadas por nível e propósito.",
-};
+    "Trilhas de aprendizado em arquitetura de software organizadas por nível e tema — Fundamentos, Frontend, Backend, Design Patterns e Refatoração. Aprenda de forma progressiva com exemplos práticos em React, Next.js e Node.js.",
+  path: "/trilhas",
+  keywords: [
+    "trilhas arquitetura software",
+    "curso design patterns",
+    "aprender clean architecture",
+    "trilha frontend React",
+    "trilha backend Node.js",
+    "trilha refatoração TypeScript",
+  ],
+});
 
 export default async function TrilhasPage() {
   const trilhas = await getAllTrilhas();

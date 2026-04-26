@@ -3,12 +3,23 @@ import type { Metadata } from "next";
 import { ConceptsFilter } from "@/components/content/concepts-filter";
 import { PageContainer } from "@/components/layout/page-container";
 import { getAllConceitos } from "@/lib/content/loader";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Conceitos",
+export const metadata: Metadata = buildMetadata({
+  title: "Conceitos de Arquitetura de Software",
   description:
-    "Conceitos fundamentais de arquitetura de software, com explicações didáticas, exemplos de código e diagramas.",
-};
+    "Catálogo de conceitos de arquitetura de software com explicações didáticas, comparativos de código, diagramas e exercícios. Separação de responsabilidades, acoplamento, repository pattern, dependency injection, design patterns e muito mais.",
+  path: "/conceitos",
+  keywords: [
+    "conceitos arquitetura software",
+    "separação de responsabilidades",
+    "acoplamento coesão",
+    "repository pattern",
+    "dependency injection",
+    "strategy observer factory adapter",
+    "code smells refatoração",
+  ],
+});
 
 export default async function ConceitosPage() {
   const conceitos = await getAllConceitos();

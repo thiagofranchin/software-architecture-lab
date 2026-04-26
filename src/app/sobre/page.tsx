@@ -3,12 +3,21 @@ import Link from "next/link";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Sobre",
+export const metadata: Metadata = buildMetadata({
+  title: "Sobre o Software Architecture Lab",
   description:
-    "Software Architecture Lab é um laboratório visual e prático para aprender arquitetura de software, voltado a desenvolvedores frontend, backend e fullstack.",
-};
+    "Conheça o Software Architecture Lab: uma plataforma de aprendizado visual e prático para arquitetura de software. Para desenvolvedores frontend, backend e fullstack que querem evoluir de código para decisões arquiteturais aplicadas em React, Next.js e Node.js.",
+  path: "/sobre",
+  keywords: [
+    "sobre software architecture lab",
+    "plataforma aprendizado arquitetura",
+    "curso gratuito arquitetura software",
+    "desenvolvedores frontend backend",
+    "aprender React Next.js arquitetura",
+  ],
+});
 
 const audiencia = [
   "Desenvolvedores frontend que querem evoluir para uma visão fullstack.",

@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 
 import { getAllConceitos, getAllTrilhas } from "@/lib/content/loader";
+import { SITE_URL } from "@/lib/seo";
 
-const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://sal-lab.vercel.app";
+const LAUNCH_DATE = new Date("2025-01-01");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [trilhas, conceitos] = await Promise.all([
@@ -12,31 +12,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    "",
-    "/trilhas",
-    "/conceitos",
-    "/glossario",
-    "/roadmap",
-    "/sobre",
-  ].map((path) => ({
-    url: `${baseUrl}${path}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: path === "" ? 1 : 0.8,
-  }));
+    {
+      url: SITE_URL,
+      lastModified: LAUNCH_DATE,
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: `${SITE_URL}/trilhas`,
+      lastModified: LAUNCH_DATE,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/conceitos`,
+      lastModified: LAUNCH_DATE,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/glossario`,
+      lastModified: LAUNCH_DATE,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/roadmap`,
+      lastModified: LAUNCH_DATE,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${SITE_URL}/sobre`,
+      lastModified: LAUNCH_DATE,
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+  ];
 
   const trilhaRoutes: MetadataRoute.Sitemap = trilhas.map((trilha) => ({
-    url: `${baseUrl}/trilhas/${trilha.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly",
-    priority: 0.7,
+    url: `${SITE_URL}/trilhas/${trilha.slug}`,
+    lastModified: LAUNCH_DATE,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
   }));
 
   const conceitoRoutes: MetadataRoute.Sitemap = conceitos.map((conceito) => ({
-    url: `${baseUrl}/conceitos/${conceito.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly",
-    priority: 0.6,
+    url: `${SITE_URL}/conceitos/${conceito.slug}`,
+    lastModified: LAUNCH_DATE,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
   }));
 
   return [...staticRoutes, ...trilhaRoutes, ...conceitoRoutes];
