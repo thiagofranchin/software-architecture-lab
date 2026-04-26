@@ -56,5 +56,6 @@ export function parseFrontmatter(
     tags: raw.tags as string[],
     related: raw.related as string[],
     published: raw.published as boolean,
+    ...(typeof raw.order === "number" ? { order: raw.order } : {}),
   };
 }

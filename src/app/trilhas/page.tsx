@@ -45,6 +45,7 @@ export default async function TrilhasPage() {
               level={trilha.level}
               duration={trilha.duration}
               tags={trilha.tags}
+              order={trilha.order}
             />
           ))}
         </div>
