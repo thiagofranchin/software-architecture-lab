@@ -175,6 +175,21 @@ function OrderList() {
 </CodeGood>
 </CompareGrid>
 
+## Visualização orbital das camadas
+
+As três camadas formam órbitas ao redor do núcleo da aplicação. Camadas internas não conhecem as externas — as dependências sempre fluem para dentro.
+
+<OrbitDiagram
+  title="Camadas do Frontend — Diagrama Orbital"
+  centerLabel="Feature / Domínio"
+  centerColor="#00b8d9"
+  layers={[
+    { label: "Camada de Serviço", color: "#3ecf8e", items: ["fetchUser", "updateOrder", "getProducts"] },
+    { label: "Camada de Lógica (Hooks)", color: "#9b6fff", items: ["useUser", "useOrders", "useCart"] },
+    { label: "Camada de UI (Componentes)", color: "#00b8d9", items: ["UserProfile", "OrderList", "CartButton"] },
+  ]}
+/>
+
 ## Sinais de que as camadas estão misturadas
 
 - `fetch` diretamente dentro de componentes com JSX.

@@ -25,6 +25,18 @@ A **Service Layer** (Camada de Serviço) é onde vive a lógica de negócio de u
 
 Quando a lógica de negócio está no lugar certo, cada camada tem uma responsabilidade clara: o controller cuida de HTTP, o service cuida de negócio, o repository cuida de dados.
 
+<CometFlow
+  title="Rota de uma Requisição — Service Layer"
+  cometLabel="request"
+  nodes={[
+    { label: "HTTP Request", sublabel: "entrada" },
+    { label: "Controller", sublabel: "valida HTTP" },
+    { label: "Service", sublabel: "lógica de negócio" },
+    { label: "Repository", sublabel: "acesso a dados" },
+    { label: "Database", sublabel: "persistência" },
+  ]}
+/>
+
 <Callout variant="info" title="Regra prática">
 Se você pode chamar o mesmo serviço a partir de um controller HTTP, um job agendado e um teste unitário — sem adaptar nada — a Service Layer está bem definida.
 </Callout>

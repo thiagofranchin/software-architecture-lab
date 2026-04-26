@@ -18,6 +18,9 @@ import { ConceptCard } from "@/components/content/concept-card";
 import { LayerSimulator } from "@/components/content/layer-simulator";
 import { Quiz } from "@/components/content/quiz";
 import { TrilhaCard } from "@/components/content/trilha-card";
+import { BlackHoleDiagram } from "@/components/cosmic/black-hole-diagram";
+import { CometFlow } from "@/components/cosmic/comet-flow";
+import { OrbitDiagram } from "@/components/cosmic/orbit-diagram";
 import { cn } from "@/lib/utils";
 
 type AnchorProps = ComponentPropsWithoutRef<"a">;
@@ -146,11 +149,14 @@ export const mdxComponents = {
     <td className="border-b border-border/40 px-3 py-2 align-top" {...props} />
   ),
   ArchComparator,
+  BlackHoleDiagram,
   Callout,
   CategoryBadge,
+  CometFlow,
   DecisionCard,
   DepVisualizer,
   Diagram,
+  OrbitDiagram,
   TradeoffTable,
   CodeBad,
   CodeGood,

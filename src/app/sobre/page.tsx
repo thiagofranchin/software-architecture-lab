@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ConstellationMap } from "@/components/cosmic/constellation-map";
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { getAllConceitos, getAllTrilhas } from "@/lib/content/loader";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -33,12 +35,14 @@ const diferenciais = [
   "Foco em decisões reais — quando aplicar, quando não exagerar.",
 ];
 
-export default function SobrePage() {
+export default async function SobrePage() {
+  const [trilhas, conceitos] = await Promise.all([getAllTrilhas(), getAllConceitos()]);
+
   return (
     <PageContainer size="narrow" className="py-16">
       <header className="mb-10">
-        <p className="font-mono text-xs tracking-widest text-primary uppercase">
-          O projeto
+        <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary/80">
+          [ O Projeto ]
         </p>
         <h1 className="mt-2 font-serif text-4xl font-black tracking-tight text-foreground sm:text-5xl">
           Sobre o Software Architecture Lab
@@ -95,6 +99,25 @@ export default function SobrePage() {
           ))}
         </ul>
       </section>
+
+      {/* ── Mapa de Constelações ─────────────────────────────── */}
+      {trilhas.length > 0 && (
+        <section className="mt-14 space-y-4">
+          <div>
+            <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary/80">
+              [ Mapa de Constelações ]
+            </p>
+            <h2 className="mt-1 font-serif text-2xl font-bold tracking-tight text-foreground">
+              Universo do conteúdo
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Cada trilha é uma constelação. Cada conceito é uma estrela. Clique
+              para explorar qualquer ponto do mapa.
+            </p>
+          </div>
+          <ConstellationMap trilhas={trilhas} conceitos={conceitos} />
+        </section>
+      )}
 
       <section className="mt-12 rounded-2xl border border-border/70 bg-muted/40 p-6">
         <h2 className="font-serif text-xl font-bold tracking-tight text-foreground">

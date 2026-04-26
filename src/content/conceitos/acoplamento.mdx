@@ -61,6 +61,23 @@ const users = await getUsers();
 
 No primeiro caso, o componente está acoplado **à fonte dos dados** (sabe que vem do `/api/users`, sabe que é JSON). No segundo, ele só sabe **renderizar** — quem busca e como busca é problema de outro lugar.
 
+## Mapa gravitacional do acoplamento
+
+Módulos com acoplamento alto são como buracos negros — quanto mais forte a dependência direta, mais próximo o satélite fica do centro, mais difícil é mudá-lo de posição.
+
+<BlackHoleDiagram
+  title="Mapa de Acoplamento — Módulo Central"
+  centerLabel="UserController"
+  satellites={[
+    { label: "Database", coupling: "tight" },
+    { label: "Mailer", coupling: "tight" },
+    { label: "Logger", coupling: "medium" },
+    { label: "CacheService", coupling: "medium" },
+    { label: "HttpClient", coupling: "loose" },
+    { label: "Config", coupling: "loose" },
+  ]}
+/>
+
 ## Sinais de acoplamento alto
 
 - Pequenas mudanças exigem editar muitos arquivos não relacionados aparentemente.

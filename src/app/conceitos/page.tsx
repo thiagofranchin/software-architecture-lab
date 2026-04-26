@@ -27,15 +27,16 @@ export default async function ConceitosPage() {
   return (
     <PageContainer className="py-16">
       <header className="mb-10 max-w-3xl">
-        <p className="font-mono text-xs tracking-widest text-primary uppercase">
-          Catálogo
+        <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary/80">
+          [ Base de Dados Estelar ]
         </p>
         <h1 className="mt-2 font-serif text-4xl font-black tracking-tight text-foreground sm:text-5xl">
           Conceitos
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">
-          Cada conceito é uma página independente, com resumo, problema que
-          resolve, exemplos comparativos e quando (não) aplicar.
+          Cada conceito é uma entrada independente da base de dados — com
+          resumo, problema que resolve, exemplos comparativos e quando (não)
+          aplicar.
         </p>
       </header>
 

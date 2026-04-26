@@ -27,22 +27,34 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/85 backdrop-blur-md dark:border-white/5 dark:bg-background/90">
+      {/* Linha de acento superior */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent"
+      />
+
       <PageContainer className="flex h-16 items-center justify-between gap-6">
+        {/* Logo */}
         <Link
           aria-label="Página inicial do Software Architecture Lab"
-          className="font-serif text-lg font-black tracking-tight whitespace-nowrap"
+          className="group font-serif text-lg font-black tracking-tight whitespace-nowrap"
           href="/"
           onClick={closeMobile}
         >
-          <span className="text-primary">Software</span>{" "}
+          <span className="text-primary transition-[text-shadow] group-hover:[text-shadow:0_0_12px_var(--color-primary)]">
+            Software
+          </span>{" "}
           <span className="text-foreground">Architecture</span>{" "}
-          <span className="text-accent">Lab</span>
+          <span className="text-accent transition-[text-shadow] group-hover:[text-shadow:0_0_12px_var(--color-accent)]">
+            Lab
+          </span>
         </Link>
 
+        {/* Nav desktop */}
         <nav
           aria-label="Navegação principal"
-          className="hidden flex-1 items-center justify-center gap-1 md:flex"
+          className="hidden flex-1 items-center justify-center gap-0.5 md:flex"
         >
           {navItems.map((item) => {
             const active =
@@ -52,13 +64,20 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  "relative rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
                   active
                     ? "bg-secondary text-secondary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:text-foreground dark:[text-shadow:none] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.25)]",
                 )}
               >
                 {item.label}
+                {/* Indicador de rota ativa */}
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute bottom-0 left-1/2 h-px w-4 -translate-x-1/2 rounded-full bg-primary opacity-70"
+                  />
+                )}
               </Link>
             );
           })}
@@ -84,9 +103,9 @@ export function SiteHeader() {
       {mobileOpen ? (
         <div
           id="mobile-nav"
-          className="border-t border-border/60 bg-background md:hidden"
+          className="border-t border-border/50 bg-background/95 backdrop-blur-md dark:border-white/5 md:hidden"
         >
-          <PageContainer className="flex flex-col gap-1 py-4">
+          <PageContainer className="flex flex-col gap-0.5 py-4">
             {navItems.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);

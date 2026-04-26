@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { TrilhasFilter } from "@/components/content/trilhas-filter";
 import { PageContainer } from "@/components/layout/page-container";
-import { getAllTrilhas } from "@/lib/content/loader";
+import { getAllConceitos, getAllTrilhas } from "@/lib/content/loader";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -21,21 +21,21 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function TrilhasPage() {
-  const trilhas = await getAllTrilhas();
+  const [trilhas, conceitos] = await Promise.all([getAllTrilhas(), getAllConceitos()]);
 
   return (
     <PageContainer className="py-16">
       <header className="mb-10 max-w-3xl">
-        <p className="font-mono text-xs tracking-widest text-primary uppercase">
-          Aprendizado guiado
+        <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary/80">
+          [ Mapa de Missões ]
         </p>
         <h1 className="mt-2 font-serif text-4xl font-black tracking-tight text-foreground sm:text-5xl">
           Trilhas
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">
-          Cada trilha agrupa aulas, conceitos e exercícios em uma sequência
-          intencional. Escolha pelo seu nível atual ou pelo tema que mais
-          combina com o seu próximo desafio.
+          Cada trilha é uma rota de exploração — aulas, conceitos e exercícios
+          em sequência intencional. Escolha pelo seu nível atual ou pelo setor
+          que mais combina com o seu próximo desafio.
         </p>
       </header>
 
@@ -44,7 +44,7 @@ export default async function TrilhasPage() {
           Nenhuma trilha publicada ainda. Volte em breve.
         </p>
       ) : (
-        <TrilhasFilter trilhas={trilhas} />
+        <TrilhasFilter trilhas={trilhas} conceitos={conceitos} />
       )}
     </PageContainer>
   );

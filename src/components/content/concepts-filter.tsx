@@ -42,95 +42,107 @@ export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
   const hasActiveFilter = activeCategory || activeLevel || activeTag;
 
   return (
-    <div className="space-y-4">
-      {/* Filtro por categoria */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-muted-foreground w-16 shrink-0">
-          Categoria
-        </span>
-        <button
-          type="button"
-          onClick={() => setActiveCategory(null)}
-          className={cn(
-            "rounded-full border px-3 py-1 text-xs font-semibold tracking-wide transition",
-            activeCategory === null
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border/70 text-muted-foreground hover:border-primary/50 hover:text-foreground",
-          )}
-        >
-          Todas
-        </button>
-        {categories.map((category) => (
+    <div className="space-y-6">
+      {/* Painel de filtros */}
+      <div className="rounded-xl border border-border/50 bg-card/60 p-4 backdrop-blur-sm dark:border-white/5 dark:bg-card/40 space-y-4">
+        {/* Filtro por categoria */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-muted-foreground/60 w-20 shrink-0">
+            Setor
+          </span>
           <button
-            key={category}
             type="button"
-            onClick={() =>
-              setActiveCategory((prev) => (prev === category ? null : category))
-            }
+            onClick={() => setActiveCategory(null)}
             className={cn(
-              "rounded-full transition",
-              activeCategory === category
-                ? "ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
-                : "opacity-80 hover:opacity-100",
-            )}
-            aria-pressed={activeCategory === category}
-          >
-            <CategoryBadge category={category} tone="soft" />
-          </button>
-        ))}
-      </div>
-
-      {/* Filtro por nível */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-muted-foreground w-16 shrink-0">
-          Nível
-        </span>
-        {levels.map((level) => (
-          <button
-            key={level}
-            type="button"
-            onClick={() =>
-              setActiveLevel((prev) => (prev === level ? null : level))
-            }
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold tracking-wide transition",
-              activeLevel === level
+              "rounded-full border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-wide transition",
+              activeCategory === null
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border/70 text-muted-foreground hover:border-primary/50 hover:text-foreground",
             )}
-            aria-pressed={activeLevel === level}
           >
-            {level}
+            Todos
           </button>
-        ))}
-      </div>
-
-      {/* Filtro por tag */}
-      {allTags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground w-16 shrink-0">
-            Tags
-          </span>
-          {allTags.map((tag) => (
+          {categories.map((category) => (
             <button
-              key={tag}
+              key={category}
               type="button"
               onClick={() =>
-                setActiveTag((prev) => (prev === tag ? null : tag))
+                setActiveCategory((prev) => (prev === category ? null : category))
               }
               className={cn(
-                "rounded-full border px-3 py-1 font-mono text-xs transition",
-                activeTag === tag
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/70 text-muted-foreground hover:border-primary/50 hover:text-foreground",
+                "rounded-full transition",
+                activeCategory === category
+                  ? "ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
+                  : "opacity-75 hover:opacity-100",
               )}
-              aria-pressed={activeTag === tag}
+              aria-pressed={activeCategory === category}
             >
-              #{tag}
+              <CategoryBadge
+                category={category}
+                tone={activeCategory === category ? "glow" : "soft"}
+              />
             </button>
           ))}
         </div>
-      )}
+
+        {/* Divisor */}
+        <div className="h-px bg-border/40 dark:bg-white/5" />
+
+        {/* Filtro por nível */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-muted-foreground/60 w-20 shrink-0">
+            Nível
+          </span>
+          {levels.map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() =>
+                setActiveLevel((prev) => (prev === level ? null : level))
+              }
+              className={cn(
+                "rounded-sm border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-wide transition",
+                activeLevel === level
+                  ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
+                  : "border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground",
+              )}
+              aria-pressed={activeLevel === level}
+            >
+              {level}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtro por tag */}
+        {allTags.length > 0 && (
+          <>
+            <div className="h-px bg-border/40 dark:bg-white/5" />
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-muted-foreground/60 w-20 shrink-0">
+                Tags
+              </span>
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() =>
+                    setActiveTag((prev) => (prev === tag ? null : tag))
+                  }
+                  className={cn(
+                    "rounded-sm border px-2.5 py-0.5 font-mono text-[0.68rem] tracking-wide transition",
+                    activeTag === tag
+                      ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
+                      : "border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                  )}
+                  aria-pressed={activeTag === tag}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Limpar filtros */}
       {hasActiveFilter && (
@@ -141,19 +153,19 @@ export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
             setActiveLevel(null);
             setActiveTag(null);
           }}
-          className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground transition"
+          className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground/60 underline underline-offset-4 hover:text-foreground transition"
         >
-          Limpar filtros
+          ✕ Limpar filtros
         </button>
       )}
 
       {/* Resultados */}
       {filtered.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">
-          Nenhum conceito encontrado para estes filtros.
+        <p className="mt-6 font-mono text-sm text-muted-foreground">
+          [ Nenhum conceito encontrado para estes filtros ]
         </p>
       ) : (
-        <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((item) => (
             <ConceptCard
               key={item.slug}
