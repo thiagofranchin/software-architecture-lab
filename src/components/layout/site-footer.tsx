@@ -60,7 +60,7 @@ export function SiteFooter() {
         <div className="mt-10 flex flex-col gap-2 border-t border-border/50 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} Software Architecture Lab. Todos os direitos reservados.</p>
           <p className="font-mono">
-            Construído com Next.js, Tailwind CSS e MDX.
+            Construído com ❤️ por Thiago Franchin
           </p>
         </div>
       </PageContainer>
