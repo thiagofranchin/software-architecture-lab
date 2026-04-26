@@ -1,0 +1,20 @@
+{
+  "name": "Software Architecture Lab Local Plugins",
+  "interface": {
+    "displayName": "Software Architecture Lab Local Plugins"
+  },
+  "plugins": [
+    {
+      "name": "software-architecture-lab",
+      "source": {
+        "source": "local",
+        "path": "./plugins/software-architecture-lab"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Criar Quiz"
+  short_description: "Gera quizzes MDX interativos"
+  default_prompt: "Use $criar-quiz para gerar um bloco <Quiz> consistente com os conceitos e trilhas deste projeto."

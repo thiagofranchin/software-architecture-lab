@@ -1,0 +1,4 @@
+interface:
+  display_name: "Revisar Trilha"
+  short_description: "Valida consistência de uma trilha"
+  default_prompt: "Use $revisar-trilha para revisar frontmatter, ConceptCards, links e vínculos de uma trilha antes de publicar."

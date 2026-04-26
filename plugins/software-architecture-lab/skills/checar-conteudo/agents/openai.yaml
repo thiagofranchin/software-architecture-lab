@@ -1,0 +1,4 @@
+interface:
+  display_name: "Checar Conteúdo"
+  short_description: "Audita a integridade do conteúdo MDX"
+  default_prompt: "Use $checar-conteudo para auditar trilhas, conceitos, frontmatter, slugs, links internos e referências cruzadas deste projeto."

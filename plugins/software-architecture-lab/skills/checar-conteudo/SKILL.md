@@ -1,0 +1,122 @@
+---
+name: checar-conteudo
+description: Verifica a integridade de todo o conteúdo MDX do Software Architecture Lab, incluindo slugs quebrados, order duplicado, frontmatter inválido e referências cruzadas inconsistentes. Use quando o usuário pedir para checar, auditar, validar ou diagnosticar o conteúdo do projeto.
+---
+
+# Checar Conteúdo
+
+Roda uma auditoria completa de todo o conteúdo em `src/content/` e reporta problemas que impediriam build correto ou navegação quebrada no site.
+
+## O que é verificado
+
+| Verificação | Descrição |
+| --- | --- |
+| Frontmatter inválido | Campos faltando ou com valores fora do conjunto permitido |
+| Slugs duplicados | Dois arquivos com o mesmo `slug` na mesma pasta |
+| `order` duplicado | Dois arquivos com o mesmo `order` na mesma pasta |
+| Referências quebradas em `related` | Slug listado em `related` não existe em `src/content/conceitos/` |
+| ConceptCards com slug inexistente | `<ConceptCard slug="x">` onde `x` não existe em conceitos |
+| Links internos quebrados | `/conceitos/<slug>` ou `/trilhas/<slug>` no corpo MDX sem arquivo correspondente |
+| `published: false` esquecido | Arquivos com `published: false` que podem ter sido esquecidos |
+
+## Passo a passo
+
+Execute as verificações em sequência e acumule os resultados.
+
+### 1. Inventário
+
+```bash
+grep -h "^slug:" src/content/conceitos/*.mdx | sed 's/slug: //' | sed 's/"//g' | sort
+grep -h "^slug:" src/content/trilhas/*.mdx | sed 's/slug: //' | sed 's/"//g' | sort
+```
+
+Salve mentalmente os dois conjuntos de slugs para usar nas verificações seguintes.
+
+### 2. Slugs e orders duplicados
+
+```bash
+grep -h "^slug:" src/content/conceitos/*.mdx | sort | uniq -d
+grep -h "^slug:" src/content/trilhas/*.mdx | sort | uniq -d
+grep -h "^order:" src/content/conceitos/*.mdx | sort | uniq -d
+grep -h "^order:" src/content/trilhas/*.mdx | sort | uniq -d
+```
+
+### 3. Frontmatter inválido
+
+Para cada arquivo `.mdx`, verifique:
+
+- `category` é uma de: `Fundamentos`, `Frontend`, `Backend`, `Patterns`, `Prática`
+- `level` é um de: `Iniciante`, `Intermediário`, `Avançado`
+- Todos os campos obrigatórios estão presentes: `title slug description category level duration tags related published`
+
+```bash
+grep -rh "^category:" src/content/ | sort | uniq -c | sort -rn
+grep -rh "^level:" src/content/ | sort | uniq -c | sort -rn
+```
+
+### 4. Referências quebradas em `related`
+
+Para cada arquivo, extraia os slugs em `related` e verifique se existem em `src/content/conceitos/`:
+
+```bash
+grep -rh "^  - " src/content/trilhas/*.mdx src/content/conceitos/*.mdx
+```
+
+Compare cada slug com o inventário do passo 1.
+
+### 5. ConceptCards com slug inexistente
+
+```bash
+grep -rh 'slug="' src/content/trilhas/*.mdx | grep -o 'slug="[^"]*"' | sed 's/slug="//;s/"//'
+```
+
+Cada slug encontrado deve existir no inventário de conceitos.
+
+### 6. Links internos quebrados
+
+```bash
+grep -roh '/conceitos/[a-z0-9-]*' src/content/ | sort -u
+grep -roh '/trilhas/[a-z0-9-]*' src/content/ | sort -u
+```
+
+Para cada link, verifique se o slug correspondente existe no inventário.
+
+### 7. Arquivos não publicados
+
+```bash
+grep -rln "^published: false" src/content/
+```
+
+Liste-os no relatório como aviso; podem ser rascunhos esquecidos.
+
+## Formato do relatório
+
+```text
+## Auditoria de Conteúdo — <data>
+
+### Resumo
+- Trilhas: X arquivos (Y publicadas)
+- Conceitos: X arquivos (Y publicados)
+
+### ❌ Erros críticos (impedem build ou criam links quebrados)
+- `src/content/trilhas/foo.mdx`: slug "bar-baz" em `related` não existe
+- `src/content/conceitos/baz.mdx`: category "Avancado" inválida (deveria ser "Avançado")
+
+### ⚠️ Avisos (não quebram o site mas merecem atenção)
+- `src/content/trilhas/foo.mdx` e `src/content/trilhas/bar.mdx`: order 2 duplicado
+- `src/content/conceitos/draft.mdx`: published: false (rascunho esquecido?)
+
+### ✅ OK
+- Nenhum slug duplicado encontrado
+- Todos os ConceptCards referenciam slugs existentes
+```
+
+Se não houver erros críticos, declare explicitamente: **"Nenhum erro crítico encontrado. O conteúdo está consistente."**
+
+## Correções automáticas
+
+Se o usuário pedir para corrigir os erros encontrados, aplique as correções uma a uma e confirme cada mudança. Prioridade:
+
+1. Erros de frontmatter (typos em `category` ou `level`)
+2. Slugs quebrados em `related`
+3. `order` duplicado, consultando o usuário sobre a ordem desejada quando houver ambiguidade

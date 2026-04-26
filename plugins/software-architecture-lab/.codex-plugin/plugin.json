@@ -1,0 +1,29 @@
+{
+  "name": "software-architecture-lab",
+  "version": "1.0.0",
+  "description": "Project-local Codex skills for the Software Architecture Lab repository",
+  "author": {
+    "name": "Software Architecture Lab"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "codex",
+    "skills",
+    "mdx",
+    "nextjs",
+    "education"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Software Architecture Lab",
+    "developerName": "Software Architecture Lab",
+    "shortDescription": "Project-local skills for trilhas, conceitos, quizzes, SEO, and MDX components",
+    "longDescription": "A local Codex plugin that keeps project-specific workflows versioned inside this repository.",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Use the local Software Architecture Lab skills when creating or reviewing trilhas, conceitos, quizzes, SEO, or MDX components in this repository."
+    ],
+    "screenshots": []
+  }
+}

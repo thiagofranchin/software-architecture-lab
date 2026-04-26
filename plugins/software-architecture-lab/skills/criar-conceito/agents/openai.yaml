@@ -1,0 +1,4 @@
+interface:
+  display_name: "Criar Conceito"
+  short_description: "Cria novas aulas MDX para o lab"
+  default_prompt: "Use $criar-conceito para criar uma nova aula em src/content/conceitos seguindo a estrutura e o tom deste projeto."

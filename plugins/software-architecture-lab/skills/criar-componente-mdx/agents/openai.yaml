@@ -1,0 +1,4 @@
+interface:
+  display_name: "Criar Componente MDX"
+  short_description: "Cria e registra componentes MDX do projeto"
+  default_prompt: "Use $criar-componente-mdx para criar um novo componente React em src/components/content e registrá-lo no sistema MDX."

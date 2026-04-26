@@ -1,0 +1,4 @@
+interface:
+  display_name: "Aplicar SEO"
+  short_description: "Audita e melhora o SEO do projeto"
+  default_prompt: "Use $aplicar-seo para revisar ou melhorar metadados, sitemap, robots, Open Graph e JSON-LD deste projeto."

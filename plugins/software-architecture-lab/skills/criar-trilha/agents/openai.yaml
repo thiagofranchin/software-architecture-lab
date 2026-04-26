@@ -1,0 +1,4 @@
+interface:
+  display_name: "Criar Trilha"
+  short_description: "Cria trilhas MDX com ConceptCards"
+  default_prompt: "Use $criar-trilha para criar uma nova trilha em src/content/trilhas seguindo o padrão deste projeto."
