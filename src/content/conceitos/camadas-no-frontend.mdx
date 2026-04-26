@@ -1,0 +1,191 @@
+---
+title: "Camadas no Frontend"
+slug: "camadas-no-frontend"
+description: "Services, hooks e componentes formam camadas com responsabilidades distintas. Entender onde cada coisa mora evita que lógica de negócio se espalhe por toda a aplicação."
+category: "Frontend"
+level: "Intermediário"
+duration: "14 min"
+tags:
+  - arquitetura
+  - frontend
+  - camadas
+  - hooks
+  - services
+related:
+  - componentes-vs-containers
+  - separacao-de-responsabilidades
+published: true
+---
+
+## Resumo
+
+Arquitetura em camadas não é exclusividade do backend. Um frontend bem estruturado também tem **zonas claras de responsabilidade**: onde os dados são buscados e transformados, onde a lógica de UI vive, e onde os elementos visuais são renderizados.
+
+Sem essas fronteiras, a lógica de negócio migra gradualmente para os componentes — e o código que deveria descrever a interface passa a carregar regras, validações e chamadas de API lado a lado com o JSX.
+
+## As três camadas
+
+### Camada de Serviço
+
+Responsável por **comunicação com o mundo externo**: APIs, localStorage, cookies, WebSockets. Não sabe nada sobre React — são funções puras ou classes que recebem e retornam dados.
+
+```ts
+// src/features/users/userService.ts
+export async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error("Usuário não encontrado");
+  return res.json();
+}
+
+export async function updateUserName(
+  id: string,
+  name: string
+): Promise<void> {
+  await fetch(`/api/users/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name }),
+  });
+}
+```
+
+Sem React, sem JSX, sem hooks. Testável com um simples `fetch` mockado.
+
+### Camada de Lógica (Hooks)
+
+Responsável por **orquestrar o serviço e gerenciar o estado reativo**. Usa os serviços para buscar dados, expõe estado e ações para os componentes, mas não renderiza nada.
+
+```ts
+// src/features/users/useUser.ts
+function useUser(id: string) {
+  const [user, setUser] = useState<User | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+
+  useEffect(() => {
+    setStatus("loading");
+    fetchUser(id)
+      .then(data => { setUser(data); setStatus("idle"); })
+      .catch(() => setStatus("error"));
+  }, [id]);
+
+  const rename = async (name: string) => {
+    await updateUserName(id, name);
+    setUser(prev => prev ? { ...prev, name } : prev);
+  };
+
+  return { user, status, rename };
+}
+```
+
+O hook coordena a camada de serviço e expõe uma API limpa para o componente. Não importa de onde os dados vêm — o componente não sabe.
+
+### Camada de UI (Componentes)
+
+Responsável por **renderizar e capturar interações**. Recebe dados e callbacks via props, sem saber como os dados foram buscados ou de onde vieram.
+
+```tsx
+// src/features/users/UserProfile.tsx
+function UserProfile({ userId }: { userId: string }) {
+  const { user, status, rename } = useUser(userId);
+
+  if (status === "loading") return <Skeleton />;
+  if (status === "error") return <ErrorMessage />;
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <button onClick={() => rename("Novo Nome")}>
+        Editar
+      </button>
+    </div>
+  );
+}
+```
+
+<Callout variant="info" title="Componentes visuais vs componentes de tela">
+Dentro da camada de UI, ainda vale separar componentes genéricos (Button, Card, Modal) dos componentes de tela (UserProfile, OrderList). Componentes genéricos não conhecem domínio. Componentes de tela conectam o domínio com a apresentação.
+</Callout>
+
+## Por que essa separação importa
+
+<CompareGrid>
+<CodeBad title="Tudo no componente">
+
+```tsx
+function OrderList() {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/orders")
+      .then(r => r.json())
+      .then(data =>
+        // lógica de negócio dentro do componente:
+        setOrders(data.filter(o => o.status !== "cancelled")
+          .map(o => ({
+            ...o,
+            total: o.items.reduce((s, i) => s + i.price, 0),
+          }))
+        )
+      );
+  }, []);
+
+  return orders.map(o => (
+    <div key={o.id}>
+      {o.id} — R$ {o.total.toFixed(2)}
+    </div>
+  ));
+}
+```
+
+</CodeBad>
+<CodeGood title="Cada responsabilidade no lugar certo">
+
+```ts
+// orderService.ts
+export async function fetchActiveOrders(): Promise<Order[]> {
+  const res = await fetch("/api/orders");
+  const data = await res.json();
+  return data.filter(o => o.status !== "cancelled");
+}
+
+// useOrders.ts
+function useOrders() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  useEffect(() => {
+    fetchActiveOrders().then(setOrders);
+  }, []);
+  const withTotal = orders.map(o => ({
+    ...o,
+    total: o.items.reduce((s, i) => s + i.price, 0),
+  }));
+  return { orders: withTotal };
+}
+
+// OrderList.tsx
+function OrderList() {
+  const { orders } = useOrders();
+  return orders.map(o => (
+    <div key={o.id}>
+      {o.id} — R$ {o.total.toFixed(2)}
+    </div>
+  ));
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Sinais de que as camadas estão misturadas
+
+- `fetch` diretamente dentro de componentes com JSX.
+- Lógica de transformação de dados (`filter`, `map`, cálculos) dentro do return do componente.
+- Hooks que retornam JSX.
+- Funções de serviço que importam `useState` ou `useEffect`.
+
+<Callout variant="atencao" title="Não force a separação em projetos simples">
+Um formulário pequeno com 3 campos não precisa de serviço, hook e componente separados. A separação em camadas compensa quando há lógica real a isolar e quando múltiplas partes do sistema precisam da mesma lógica. Comece simples e extraia quando a complexidade justificar.
+</Callout>
+
+## Conceitos relacionados
+
+- [Componentes vs Containers](/conceitos/componentes-vs-containers) — como a divisão UI / lógica se manifesta em componentes.
+- [Separação de Responsabilidades](/conceitos/separacao-de-responsabilidades) — o princípio que fundamenta toda essa organização.

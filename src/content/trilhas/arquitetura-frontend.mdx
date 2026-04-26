@@ -1,0 +1,148 @@
+---
+title: "Arquitetura Frontend"
+slug: "arquitetura-frontend"
+description: "Aprenda a estruturar aplicações React e Next.js com clareza: separe UI de lógica, distribua estado corretamente e organize o projeto para que ele sobreviva ao crescimento."
+category: "Frontend"
+level: "Intermediário"
+duration: "3h"
+tags:
+  - frontend
+  - react
+  - next.js
+  - estado
+  - componentes
+related:
+  - colocalizacao-de-estado
+  - componentes-vs-containers
+  - camadas-no-frontend
+published: true
+---
+
+## Sobre esta trilha
+
+A trilha **Arquitetura Frontend** responde a uma pergunta que todo desenvolvedor React enfrenta cedo ou tarde: **onde coloco isso?**
+
+Onde vai a chamada de API? Onde fica a validação? Quem cuida do estado? Quando criar um hook customizado? A maioria das decisões arquiteturais no frontend não aparece em tutoriais — você descobre que as suas foram erradas quando o projeto começa a enrijecer.
+
+<Callout variant="info" title="Para quem é">
+Desenvolvedores com experiência em React que querem sair do "funciona mas está bagunçado" e chegar em "funciona e qualquer pessoa do time entende".
+</Callout>
+
+## O que você vai aprender
+
+- Como dividir um frontend em camadas claras: UI, lógica e estado.
+- A diferença entre componentes que renderizam e componentes que decidem.
+- Como e onde colocar estado para não brigar com ele em todo lugar.
+- Como organizar pastas e módulos para que o projeto escale sem virar labirinto.
+- Quando extrair um hook, um serviço ou uma função pura.
+
+## Aulas
+
+<div className="flex flex-col gap-4">
+  <ConceptCard
+    title="Colocalização de Estado"
+    description="Estado que mora longe de onde é usado cria dependências invisíveis. Aprenda a decidir onde cada pedaço de estado pertence, do componente ao contexto global."
+    slug="colocalizacao-de-estado"
+    category="Frontend"
+    level="Intermediário"
+    duration="12 min"
+  />
+
+  <ConceptCard
+    title="Componentes vs Containers"
+    description="Separar componentes que renderizam dos que buscam e decidem é o primeiro passo para um frontend testável e reutilizável."
+    slug="componentes-vs-containers"
+    category="Frontend"
+    level="Intermediário"
+    duration="10 min"
+  />
+
+  <ConceptCard
+    title="Camadas no Frontend"
+    description="Services, hooks e componentes formam camadas distintas. Entenda onde cada responsabilidade mora e por que misturá-las custa caro."
+    slug="camadas-no-frontend"
+    category="Frontend"
+    level="Intermediário"
+    duration="14 min"
+  />
+</div>
+
+## Por que o frontend precisa de arquitetura?
+
+O senso comum trata frontend como "a parte fácil". A lógica real está no backend, certo?
+
+Na prática, frontends modernos acumulam:
+
+- **Regras de negócio vazadas**: validações, formatações e cálculos espalhados por componentes.
+- **Estado global de forma errada**: Zustand/Redux usado como atalho para qualquer coisa que precise ser compartilhada.
+- **Componentes que sabem demais**: um componente que busca dados, valida, formata e renderiza ao mesmo tempo é impossível de testar e difícil de reusar.
+
+Arquitetura frontend não é sobre escolher o framework certo. É sobre **decidir onde cada coisa mora** — e ter consistência nisso.
+
+## As três camadas de um frontend estruturado
+
+Um frontend saudável se comporta como três zonas bem definidas:
+
+| Camada | Responsabilidade |
+|---|---|
+| **UI** (Componentes) | Renderiza. Recebe props. Sem lógica de negócio. |
+| **Lógica** (Hooks / Services) | Busca dados, transforma, valida. Sem JSX. |
+| **Estado** (Local / Global / Servidor) | Gerencia o que muda com o tempo. Sem side effects de UI. |
+
+Cada camada tem uma responsabilidade única. Quando uma camada começa a fazer o trabalho de outra, é o sinal de que algo precisa ser movido.
+
+<Callout variant="atencao" title="Não é regra absoluta">
+Essa divisão é um modelo mental, não uma lei. Um componente de formulário simples pode ter seu próprio estado interno sem passar por um hook. O objetivo é evitar que a complexidade cresça sem critério, não criar burocracia onde não há necessidade.
+</Callout>
+
+## Organizando o projeto
+
+Não existe estrutura de pastas universal, mas existe um princípio que funciona sempre: **organize por responsabilidade, não por tipo de arquivo**.
+
+<CompareGrid>
+<CodeBad title="Organização por tipo (não escala)">
+
+```
+src/
+├── components/
+│   ├── Header.tsx
+│   ├── UserCard.tsx
+│   └── OrderList.tsx
+├── hooks/
+│   ├── useUser.ts
+│   └── useOrders.ts
+└── services/
+    ├── userService.ts
+    └── orderService.ts
+```
+
+</CodeBad>
+<CodeGood title="Organização por domínio (escala)">
+
+```
+src/
+├── features/
+│   ├── users/
+│   │   ├── UserCard.tsx
+│   │   ├── useUser.ts
+│   │   └── userService.ts
+│   └── orders/
+│       ├── OrderList.tsx
+│       ├── useOrders.ts
+│       └── orderService.ts
+└── components/      # só componentes verdadeiramente genéricos
+    └── Button.tsx
+```
+
+</CodeGood>
+</CompareGrid>
+
+Na organização por tipo, adicionar a funcionalidade "Pedidos" exige tocar em três pastas diferentes. Na organização por domínio, tudo de pedidos mora junto — ler, entender e modificar fica muito mais fácil.
+
+## Próximos passos
+
+Depois desta trilha, os conceitos a explorar são:
+
+- **Separação de Responsabilidades** — o princípio por trás de tudo que foi visto aqui.
+- **Acoplamento** — como medir e reduzir dependências entre módulos.
+- **Design Patterns** — padrões como Strategy e Observer aplicados ao frontend.

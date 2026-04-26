@@ -1,0 +1,138 @@
+---
+title: "Componentes vs Containers"
+slug: "componentes-vs-containers"
+description: "Separar componentes que renderizam dos que buscam dados e tomam decisões é o primeiro passo para um frontend testável, reutilizável e fácil de entender."
+category: "Frontend"
+level: "Intermediário"
+duration: "10 min"
+tags:
+  - componentes
+  - react
+  - testabilidade
+  - separacao
+related:
+  - colocalizacao-de-estado
+  - separacao-de-responsabilidades
+published: true
+---
+
+## Resumo
+
+**Componentes** renderizam. **Containers** orquestram.
+
+Essa distinção — popularizada por Dan Abramov como "Presentational vs Container Components" — é um dos padrões mais práticos do desenvolvimento React. A ideia central: um componente que sabe como buscar dados não deve também decidir como renderizá-los. São responsabilidades diferentes, e misturá-las cria código difícil de testar e impossível de reusar.
+
+<Callout variant="info" title="Nomenclatura">
+Dan Abramov, criador do padrão original, afirmou em 2019 que com hooks a separação fica mais natural sem precisar de dois tipos de componentes distintos. O princípio continua válido — o que muda é onde a lógica mora (no hook, não em um componente separado).
+</Callout>
+
+## Problema que resolve
+
+Quando um componente busca dados, valida, formata e renderiza ao mesmo tempo, ele só pode ser usado em um contexto específico. Não dá para reusar a parte visual em outra tela. Não dá para testar a lógica sem montar o DOM. Não dá para trocar a fonte de dados sem mexer na apresentação.
+
+## O padrão na prática
+
+<CompareGrid>
+<CodeBad title="Tudo junto — difícil de testar e reusar">
+
+```tsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        setUser(data);
+        setLoading(false);
+      });
+  }, [userId]);
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <img src={user.avatar} alt={user.name} />
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+```
+
+</CodeBad>
+<CodeGood title="Separado — cada parte faz uma coisa">
+
+```tsx
+// Componente: só renderiza, recebe o que precisa
+function UserProfileCard({ name, email, avatar }) {
+  return (
+    <div>
+      <img src={avatar} alt={name} />
+      <h1>{name}</h1>
+      <p>{email}</p>
+    </div>
+  );
+}
+
+// Hook: busca e transforma os dados
+function useUser(userId) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(r => r.json())
+      .then(data => { setUser(data); setLoading(false); });
+  }, [userId]);
+
+  return { user, loading };
+}
+
+// Container: cola as duas partes
+function UserProfilePage({ userId }) {
+  const { user, loading } = useUser(userId);
+  if (loading) return <Spinner />;
+  return <UserProfileCard {...user} />;
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+Com a separação, `UserProfileCard` pode ser reutilizado em qualquer lugar que tenha os dados de um usuário. O hook `useUser` pode ser trocado por uma chamada ao React Query sem tocar na apresentação. E ambos podem ser testados de forma independente.
+
+## Como hooks substituem containers
+
+Antes dos hooks (React < 16.8), containers eram componentes de classe que gerenciavam estado e passavam props para componentes funcionais filhos. Com hooks customizados, a lógica de orquestração migra para funções reutilizáveis — sem criar um componente a mais na árvore.
+
+```tsx
+// O hook é o novo "container"
+function useOrderDetails(orderId) {
+  const { data, isLoading } = useQuery(
+    ['order', orderId],
+    () => fetchOrder(orderId)
+  );
+  const total = data?.items.reduce((sum, i) => sum + i.price, 0);
+  return { order: data, isLoading, total };
+}
+
+// O componente só renderiza
+function OrderSummary({ orderId }) {
+  const { order, isLoading, total } = useOrderDetails(orderId);
+  if (isLoading) return <Skeleton />;
+  return <OrderCard order={order} total={total} />;
+}
+```
+
+## Sinais de mistura excessiva
+
+- O componente tem `useEffect` com fetch e JSX no mesmo arquivo de 200 linhas.
+- Para testar se o layout está correto, você precisa mockar uma API.
+- Copiar um componente visual para outra tela exige carregar toda a lógica junto.
+
+## Conceitos relacionados
+
+- [Colocalização de Estado](/conceitos/colocalizacao-de-estado) — onde o estado gerenciado pelo container deve morar.
+- [Separação de Responsabilidades](/conceitos/separacao-de-responsabilidades) — o princípio geral por trás deste padrão.

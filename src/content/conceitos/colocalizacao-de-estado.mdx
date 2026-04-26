@@ -1,0 +1,126 @@
+---
+title: "Colocalização de Estado"
+slug: "colocalizacao-de-estado"
+description: "Estado que mora longe de onde é usado cria dependências invisíveis e re-renders desnecessários. Aprenda a decidir onde cada pedaço de estado pertence."
+category: "Frontend"
+level: "Intermediário"
+duration: "12 min"
+tags:
+  - estado
+  - react
+  - performance
+  - componentes
+related:
+  - componentes-vs-containers
+  - acoplamento
+published: true
+---
+
+## Resumo
+
+**Colocalização de estado** é o princípio de manter o estado **o mais perto possível de onde ele é usado**. Parece óbvio, mas a tendência natural é mover estado para cima — para um contexto global, para o componente pai, para o Redux — na primeira vez que dois componentes precisam compartilhá-lo.
+
+O resultado é um estado global cheio de coisas que só uma parte da tela usa, re-renders que afetam componentes que não se importam com aquela mudança, e dificuldade para entender o fluxo de dados.
+
+## Problema que resolve
+
+Quando o estado vai para o lugar errado, ele carrega consigo todos os componentes do caminho. Um `isModalOpen` no store global re-renderiza potencialmente a árvore inteira. Um `inputValue` do formulário de busca no `AppContext` força todo componente que lê esse contexto a re-renderizar a cada tecla.
+
+Além do custo de performance, o custo de leitura aumenta: para entender o que um componente faz, você precisa rastrear o estado por vários arquivos.
+
+## A hierarquia do estado
+
+Antes de decidir onde colocar um pedaço de estado, pergunte: **quem precisa saber disso?**
+
+```
+Só este componente?       → useState local
+Irmãos próximos?          → Levantar ao pai mais próximo (lifting state up)
+Uma subárvore inteira?    → Context API com Provider localizado
+Dados do servidor?        → React Query / SWR — não é estado, é cache
+Realmente global?         → Zustand/Redux (login, tema, carrinho)
+```
+
+<Callout variant="info" title="Estado do servidor não é estado do cliente">
+Dados buscados de uma API não são estado — são cache. Ferramentas como React Query e SWR existem exatamente para gerenciar esse cache separadamente, sem poluir o estado do cliente com dados que pertencem ao servidor.
+</Callout>
+
+## Exemplo: do global para o local
+
+<CompareGrid>
+<CodeBad title="Estado de modal no store global">
+
+```tsx
+// store.ts
+const useStore = create((set) => ({
+  isDeleteModalOpen: false,
+  userToDelete: null,
+  openDeleteModal: (user) =>
+    set({ isDeleteModalOpen: true, userToDelete: user }),
+  closeDeleteModal: () =>
+    set({ isDeleteModalOpen: false, userToDelete: null }),
+}));
+
+// UserCard.tsx — acoplado ao store global
+function UserCard({ user }) {
+  const openDeleteModal = useStore(s => s.openDeleteModal);
+  return (
+    <button onClick={() => openDeleteModal(user)}>
+      Excluir
+    </button>
+  );
+}
+```
+
+</CodeBad>
+<CodeGood title="Estado de modal colocado no componente pai">
+
+```tsx
+// UserList.tsx — modal fica aqui, onde faz sentido
+function UserList({ users }) {
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  return (
+    <>
+      {users.map(u => (
+        <UserCard
+          key={u.id}
+          user={u}
+          onDelete={() => setUserToDelete(u)}
+        />
+      ))}
+      {userToDelete && (
+        <DeleteModal
+          user={userToDelete}
+          onClose={() => setUserToDelete(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// UserCard.tsx — não sabe nada sobre modal
+function UserCard({ user, onDelete }) {
+  return <button onClick={onDelete}>Excluir</button>;
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+No segundo exemplo, o estado do modal mora em `UserList` — o lugar mais alto que ainda precisa saber sobre ele. `UserCard` continua sem acoplamento a qualquer loja global.
+
+## Sinais de que o estado está no lugar errado
+
+- Componentes que não exibem aquele dado são re-renderizados quando ele muda.
+- Para entender um componente, você precisa abrir três arquivos de store.
+- Estado de formulário está em um contexto global.
+- `useEffect` que sincroniza estado global com estado local.
+
+<Callout variant="atencao" title="Não é sobre evitar estado global">
+Estado global tem lugar certo: sessão do usuário, tema, preferências, carrinho de compras. O problema é usar estado global como atalho para qualquer coisa que dois componentes precisem compartilhar. A pergunta sempre é: qual é o componente pai mais próximo de todos os consumidores?
+</Callout>
+
+## Conceitos relacionados
+
+- [Componentes vs Containers](/conceitos/componentes-vs-containers) — quem deve gerenciar estado e quem só deve renderizá-lo.
+- [Acoplamento](/conceitos/acoplamento) — estado global é uma das formas mais silenciosas de acoplamento.
