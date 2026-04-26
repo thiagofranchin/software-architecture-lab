@@ -1,0 +1,144 @@
+---
+title: "Repository Pattern"
+slug: "repository-pattern"
+description: "Isole o acesso a dados atrás de uma interface clara. O Repository evita que lógica de banco vaze para o domínio da aplicação."
+category: "Backend"
+level: "Intermediário"
+duration: "15 min"
+tags:
+  - backend
+  - repository
+  - acesso-a-dados
+  - dominio
+  - camadas
+related:
+  - service-layer
+  - dependency-injection
+  - separacao-de-responsabilidades
+published: true
+order: 6
+---
+
+## Resumo
+
+O **Repository Pattern** é uma camada de abstração entre o domínio da aplicação e o mecanismo de persistência. Em vez de chamar o banco de dados diretamente dentro de serviços ou controllers, você define uma interface que representa a coleção — e a implementação concreta fica escondida atrás dela.
+
+O resultado: o restante do código não sabe (e não precisa saber) se os dados vêm de um banco relacional, um banco NoSQL, uma API externa ou da memória.
+
+<Callout variant="info" title="Analogia">
+Pense no Repository como uma prateleira organizada. Você pede "me dá o usuário de ID 42" — não interessa se o estoquista foi buscar no armazém, numa caixa local ou numa prateleira diferente.
+</Callout>
+
+## O problema
+
+Sem o Repository Pattern, a lógica de negócio e o acesso a dados ficam misturados:
+
+```ts
+// Dentro de um service
+async function processarPedido(pedidoId: string) {
+  const pedido = await db.query(
+    "SELECT * FROM pedidos WHERE id = $1",
+    [pedidoId]
+  );
+  // lógica de negócio misturada com SQL
+  if (pedido.status === "pendente") {
+    await db.query(
+      "UPDATE pedidos SET status = $1 WHERE id = $2",
+      ["aprovado", pedidoId]
+    );
+  }
+}
+```
+
+Problemas concretos:
+- Testar a lógica exige um banco de dados real
+- Mudar de ORM ou banco significa reescrever tudo
+- O mesmo SQL aparece em vários lugares
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Acesso direto ao banco — lógica vazada">
+
+```ts
+class PedidoService {
+  async aprovar(id: string) {
+    const rows = await db.query(
+      "SELECT * FROM pedidos WHERE id = $1", [id]
+    );
+    const pedido = rows[0];
+
+    if (pedido.status !== "pendente") return;
+
+    await db.query(
+      "UPDATE pedidos SET status = 'aprovado' WHERE id = $1", [id]
+    );
+  }
+}
+```
+
+</CodeBad>
+<CodeGood title="Com Repository — domínio isolado">
+
+```ts
+interface PedidoRepository {
+  findById(id: string): Promise<Pedido | null>;
+  save(pedido: Pedido): Promise<void>;
+}
+
+class PedidoService {
+  constructor(private repo: PedidoRepository) {}
+
+  async aprovar(id: string) {
+    const pedido = await this.repo.findById(id);
+    if (!pedido || pedido.status !== "pendente") return;
+
+    pedido.status = "aprovado";
+    await this.repo.save(pedido);
+  }
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+No segundo exemplo, `PedidoService` não tem nenhuma dependência de banco. É possível testá-lo com um repositório em memória — sem Docker, sem setup de banco.
+
+## Quando usar
+
+Use o Repository quando:
+- A lógica de negócio precisa ser testada sem banco de dados
+- O mesmo tipo de dado é acessado em mais de um lugar do sistema
+- Há possibilidade de trocar o mecanismo de persistência (ex: migrar de PostgreSQL para MongoDB)
+- Você quer separar claramente o que é domínio do que é infraestrutura
+
+<Callout variant="atencao" title="Quando não usar">
+Para scripts simples, CLIs ou protótipos, o Repository adiciona indireção sem benefício real. O padrão brilha em sistemas que crescem e precisam de testes confiáveis.
+</Callout>
+
+## Erros comuns
+
+**Repository que vaza SQL para a interface:**
+```ts
+// Errado: a interface expõe detalhes de implementação
+interface PedidoRepository {
+  query(sql: string): Promise<any[]>;
+}
+
+// Correto: a interface fala a linguagem do domínio
+interface PedidoRepository {
+  findByStatus(status: StatusPedido): Promise<Pedido[]>;
+}
+```
+
+**Repository que virou um god object:**
+Adicionar métodos como `findAllWithJoinsAndFiltersAndPagination` transforma o Repository em uma camada de relatório. Consultas complexas merecem queries dedicadas — não precisam passar pelo Repository.
+
+**Retornar entidades do banco diretamente:**
+O Repository deve retornar objetos do domínio (`Pedido`), não registros brutos do banco (`PedidoRow`). A tradução entre os dois é responsabilidade da implementação do repositório.
+
+## Conceitos relacionados
+
+- **Service Layer** — usa o Repository para executar lógica de negócio sem tocar no banco diretamente
+- **Injeção de Dependência** — mecanismo pelo qual o Repository concreto é fornecido ao Service em tempo de execução
+- **Separação de Responsabilidades** — o princípio que justifica manter domínio e persistência separados

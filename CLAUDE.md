@@ -131,6 +131,18 @@ Use a skill `/criar-trilha` ou crie manualmente `src/content/trilhas/<slug>.mdx`
 
 Use a skill `/criar-conceito` ou crie manualmente `src/content/conceitos/<slug>.mdx` com o mesmo frontmatter. Para que apareça em uma trilha, adicione o `slug` no campo `related` da trilha e adicione um `<ConceptCard>` no corpo MDX da trilha.
 
+### Trilhas publicadas
+
+| Order | Título | Slug | Categoria | Nível | Aulas |
+|---|---|---|---|---|---|
+| 1 | Fundamentos de Arquitetura de Software | `fundamentos-de-arquitetura` | Fundamentos | Iniciante | separacao-de-responsabilidades, acoplamento |
+| 2 | Arquitetura Frontend | `arquitetura-frontend` | Frontend | Intermediário | colocalizacao-de-estado, componentes-vs-containers, camadas-no-frontend |
+| 3 | Design Patterns | `design-patterns` | Patterns | Intermediário | strategy, observer, factory, adapter |
+| 4 | Arquitetura Backend | `arquitetura-backend` | Backend | Intermediário | repository-pattern, service-layer, dependency-injection |
+| 5 | Refatoração | `refatoracao` | Prática | Intermediário | code-smells, extrair-metodo, refatoracao-segura |
+
+Ao criar uma nova trilha, use o próximo `order` disponível (atualmente **6**) e atualize esta tabela.
+
 ## Skills disponíveis
 
 Skills em `.claude/skills/` automatizam tarefas recorrentes neste projeto.

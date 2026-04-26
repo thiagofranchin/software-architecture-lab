@@ -1,0 +1,166 @@
+---
+title: "Service Layer"
+slug: "service-layer"
+description: "Centralize a lógica de negócio em serviços dedicados. A Service Layer evita que regras espalhadas por controllers e repositories tornem o sistema difícil de manter."
+category: "Backend"
+level: "Intermediário"
+duration: "12 min"
+tags:
+  - backend
+  - service-layer
+  - camadas
+  - logica-de-negocio
+  - arquitetura
+related:
+  - repository-pattern
+  - dependency-injection
+  - separacao-de-responsabilidades
+published: true
+order: 7
+---
+
+## Resumo
+
+A **Service Layer** (Camada de Serviço) é onde vive a lógica de negócio de uma aplicação. Ela fica entre os controllers (que recebem requisições HTTP) e os repositories (que acessam dados) — e é responsável por orquestrar o que precisa acontecer em cada operação.
+
+Quando a lógica de negócio está no lugar certo, cada camada tem uma responsabilidade clara: o controller cuida de HTTP, o service cuida de negócio, o repository cuida de dados.
+
+<Callout variant="info" title="Regra prática">
+Se você pode chamar o mesmo serviço a partir de um controller HTTP, um job agendado e um teste unitário — sem adaptar nada — a Service Layer está bem definida.
+</Callout>
+
+## O problema
+
+Sem uma Service Layer clara, a lógica de negócio vaza para os controllers:
+
+```ts
+// Controller fazendo trabalho de negócio
+async function criarPedido(req: Request, res: Response) {
+  const { usuarioId, itens } = req.body;
+
+  // validação de negócio no controller
+  if (itens.length === 0) {
+    return res.status(400).json({ error: "Pedido sem itens" });
+  }
+
+  // cálculo de negócio no controller
+  const total = itens.reduce((s, i) => s + i.preco * i.qtd, 0);
+
+  // acesso ao banco no controller
+  const pedido = await db.insert("pedidos", { usuarioId, total, itens });
+
+  res.json(pedido);
+}
+```
+
+Problemas concretos:
+- A lógica de negócio não pode ser reutilizada fora do contexto HTTP
+- Testar exige simular `req` e `res`
+- Cada controller que precisa da mesma regra a duplica
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Lógica no controller — não reutilizável">
+
+```ts
+// routes/pedidos.ts
+router.post("/pedidos", async (req, res) => {
+  const { usuarioId, itens } = req.body;
+
+  if (itens.length === 0) {
+    return res.status(400).json({ error: "Sem itens" });
+  }
+
+  const total = itens.reduce((s, i) => s + i.preco * i.qtd, 0);
+  const usuario = await db.find("usuarios", usuarioId);
+
+  if (usuario.bloqueado) {
+    return res.status(403).json({ error: "Usuário bloqueado" });
+  }
+
+  const pedido = await db.insert("pedidos", { usuarioId, total });
+  res.json(pedido);
+});
+```
+
+</CodeBad>
+<CodeGood title="Com Service Layer — lógica isolada e reutilizável">
+
+```ts
+// services/pedido-service.ts
+class PedidoService {
+  constructor(
+    private pedidoRepo: PedidoRepository,
+    private usuarioRepo: UsuarioRepository
+  ) {}
+
+  async criar(usuarioId: string, itens: Item[]) {
+    if (itens.length === 0) throw new Error("Pedido sem itens");
+
+    const usuario = await this.usuarioRepo.findById(usuarioId);
+    if (usuario.bloqueado) throw new Error("Usuário bloqueado");
+
+    const total = itens.reduce((s, i) => s + i.preco * i.qtd, 0);
+    return this.pedidoRepo.save({ usuarioId, total, itens });
+  }
+}
+
+// routes/pedidos.ts
+router.post("/pedidos", async (req, res) => {
+  const pedido = await pedidoService.criar(
+    req.body.usuarioId,
+    req.body.itens
+  );
+  res.json(pedido);
+});
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando usar
+
+Use a Service Layer quando:
+- A mesma lógica de negócio precisa ser chamada de múltiplos pontos (HTTP, fila, cron job)
+- Os controllers estão crescendo com lógica que não é de HTTP
+- Você quer testar a lógica de negócio sem depender de framework web ou banco
+- Precisa orquestrar múltiplas operações em uma única transação de negócio
+
+<Callout variant="atencao" title="Service que só delega">
+Se um service só chama um método do repository sem fazer nada, ele não adiciona valor. A Service Layer existe para conter lógica — não para ser uma camada de pass-through.
+</Callout>
+
+## Erros comuns
+
+**Anemic Service (serviço anêmico):**
+```ts
+// Inútil: não há lógica aqui
+class UsuarioService {
+  async buscar(id: string) {
+    return this.repo.findById(id); // só delega
+  }
+}
+```
+
+**Service que acessa HTTP:**
+O service não deve conhecer `Request`, `Response` ou códigos de status HTTP. Essas responsabilidades pertencem ao controller.
+
+**Dependências hardcoded:**
+```ts
+// Errado: impossível de testar ou trocar
+class PedidoService {
+  private repo = new PedidoRepositoryPostgres(); // acoplado
+}
+
+// Correto: injetar a dependência
+class PedidoService {
+  constructor(private repo: PedidoRepository) {}
+}
+```
+
+## Conceitos relacionados
+
+- **Repository Pattern** — fornece acesso a dados que o Service orquestra
+- **Injeção de Dependência** — mecanismo pelo qual os repositories chegam ao Service sem acoplamento direto
+- **Separação de Responsabilidades** — o princípio que define por que controller, service e repository têm fronteiras distintas

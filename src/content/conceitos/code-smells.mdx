@@ -1,0 +1,202 @@
+---
+title: "Code Smells"
+slug: "code-smells"
+description: "Aprenda a reconhecer os sinais de que o código precisa ser refatorado. Code smells não são bugs — são indícios de que uma decisão de design pode estar custando caro."
+category: "Prática"
+level: "Intermediário"
+duration: "12 min"
+tags:
+  - refatoracao
+  - code-smells
+  - qualidade
+  - design
+  - boas-praticas
+related:
+  - extrair-metodo
+  - refatoracao-segura
+  - separacao-de-responsabilidades
+  - acoplamento
+published: true
+order: 9
+---
+
+## Resumo
+
+**Code smells** são características do código que indicam um problema de design potencial. Não são erros — o código funciona. Mas são sinais de que algo vai custar mais caro com o tempo: manutenção difícil, bugs frequentes, dificuldade de entender o que o código faz.
+
+O termo foi popularizado por Martin Fowler no livro *Refactoring*. A ideia é que, assim como cheiros ruins em alimentos indicam que algo está estragando, padrões ruins no código indicam que algo precisa de atenção.
+
+<Callout variant="info" title="Smells não são regras absolutas">
+Um code smell é um sinal de que vale a pena investigar — não uma sentença. Contexto importa. Às vezes o código "cheiroso" é a solução mais pragmática para o problema.
+</Callout>
+
+## Os smells mais comuns
+
+### Função longa
+
+Uma função que faz muitas coisas é difícil de entender, testar e reutilizar. Como regra prática: se você precisou escrever um comentário para explicar o que um bloco da função faz, esse bloco provavelmente merece ser uma função separada.
+
+```ts
+// 80 linhas de função que valida, calcula, salva e envia e-mail
+function processarPedido(dados: any) {
+  // validação
+  // ...
+  // cálculo de frete
+  // ...
+  // desconto
+  // ...
+  // salvar no banco
+  // ...
+  // enviar e-mail
+  // ...
+}
+```
+
+### Comentário que explica o quê, não o porquê
+
+```ts
+// Errado: o comentário diz o que o código já diz
+// Incrementa o contador
+contador++;
+
+// Correto: o comentário explica uma decisão não óbvia
+// Usa índice 1 porque a API da transportadora começa em 1, não em 0
+const indice = posicao + 1;
+```
+
+### Número mágico
+
+```ts
+// O que é 86400? Por que 0.15?
+if (tempo > 86400) aplicarDesconto(valor * 0.15);
+
+// Com nome, o código se explica
+const UM_DIA_EM_SEGUNDOS = 86400;
+const DESCONTO_FIDELIDADE = 0.15;
+if (tempo > UM_DIA_EM_SEGUNDOS) aplicarDesconto(valor * DESCONTO_FIDELIDADE);
+```
+
+### Feature Envy
+
+Uma função que acessa dados de outro objeto mais do que os próprios:
+
+```ts
+// PedidoService acessa detalhes internos de Cliente
+class PedidoService {
+  calcularDesconto(pedido: Pedido, cliente: Cliente) {
+    if (cliente.dataCadastro < new Date("2020-01-01") &&
+        cliente.totalCompras > 5000 &&
+        cliente.status === "premium") {
+      return pedido.valor * 0.1;
+    }
+    return 0;
+  }
+}
+
+// Melhor: a lógica de elegibilidade fica em Cliente
+class Cliente {
+  elegívelParaDesconto() {
+    return this.dataCadastro < new Date("2020-01-01") &&
+           this.totalCompras > 5000 &&
+           this.status === "premium";
+  }
+}
+```
+
+### Classe com muitas responsabilidades (God Class)
+
+Uma classe que sabe de tudo e faz de tudo. Geralmente o sinal mais claro é o nome genérico: `Manager`, `Helper`, `Utils`, `Handler`.
+
+```ts
+// Essa classe não deveria existir assim
+class UserManager {
+  autenticar() { ... }
+  enviarEmailBoasVindas() { ... }
+  calcularPermissoes() { ... }
+  gerarRelatorio() { ... }
+  exportarParaCSV() { ... }
+}
+```
+
+### Parâmetros demais
+
+```ts
+// Difícil de chamar, difícil de entender
+function criarUsuario(
+  nome: string, email: string, senha: string,
+  perfil: string, ativo: boolean, admin: boolean,
+  departamento: string, cargo: string
+) { ... }
+
+// Melhor: agrupar em um objeto
+function criarUsuario(dados: CriarUsuarioInput) { ... }
+```
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Vários smells em uma função">
+
+```ts
+function p(u: any, i: any[]) {
+  // check items
+  if (i.length == 0) return false;
+
+  let t = 0;
+  for (let x = 0; x < i.length; x++) {
+    t = t + i[x].p * i[x].q;
+  }
+
+  // 10% for premium
+  if (u.type == "premium") {
+    t = t - (t * 0.10);
+  }
+
+  db.save({ user: u.id, total: t, items: i });
+  return true;
+}
+```
+
+</CodeBad>
+<CodeGood title="Sem smells — legível e com responsabilidades claras">
+
+```ts
+function processarPedido(usuario: Usuario, itens: Item[]) {
+  if (itens.length === 0) throw new Error("Pedido sem itens");
+
+  const subtotal = calcularSubtotal(itens);
+  const total = aplicarDescontos(subtotal, usuario);
+
+  pedidoRepository.salvar({ usuarioId: usuario.id, total, itens });
+}
+
+function calcularSubtotal(itens: Item[]) {
+  return itens.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+}
+
+function aplicarDescontos(valor: number, usuario: Usuario) {
+  const DESCONTO_PREMIUM = 0.10;
+  return usuario.isPremium() ? valor * (1 - DESCONTO_PREMIUM) : valor;
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Quando agir
+
+Nem todo smell exige ação imediata. Pergunte-se:
+- **Vou tocar nesse código?** Se sim, vale refatorar antes de alterar.
+- **Esse código vai crescer?** Smells em código estável e pequeno costumam não valer o esforço.
+- **Há testes?** Refatorar sem testes é arriscado — primeiro adicione cobertura, depois limpe.
+
+<Callout variant="atencao" title="Regra do escoteiro">
+"Deixe o código um pouco melhor do que você encontrou." Não é necessário refatorar tudo de uma vez — pequenas melhorias consistentes constroem um código sustentável ao longo do tempo.
+</Callout>
+
+## Conceitos relacionados
+
+- **Extrair Método** — a refatoração mais comum para resolver funções longas e code smells de responsabilidade
+- **Refatoração Segura** — como aplicar mudanças sem quebrar o comportamento existente
+- **Separação de Responsabilidades** — o princípio que os smells de God Class e Feature Envy violam
+- **Acoplamento** — Feature Envy e dependências excessivas são smells diretamente ligados a alto acoplamento

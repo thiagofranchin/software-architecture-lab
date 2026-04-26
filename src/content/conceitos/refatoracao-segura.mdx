@@ -1,0 +1,176 @@
+---
+title: "Refatoração Segura"
+slug: "refatoracao-segura"
+description: "Mude a estrutura do código sem alterar seu comportamento. Refatoração segura depende de testes como rede de proteção e de passos pequenos que podem ser revertidos."
+category: "Prática"
+level: "Intermediário"
+duration: "15 min"
+tags:
+  - refatoracao
+  - testes
+  - qualidade
+  - boas-praticas
+  - seguranca
+related:
+  - code-smells
+  - extrair-metodo
+  - separacao-de-responsabilidades
+published: true
+order: 11
+---
+
+## Resumo
+
+**Refatoração** é a prática de melhorar a estrutura interna do código sem alterar seu comportamento observável. Você muda *como* o código está escrito, não *o que* ele faz.
+
+Refatoração *segura* é aquela feita com uma rede de proteção — testes — e em passos pequenos o suficiente para que, se algo der errado, o custo de reverter seja mínimo.
+
+<Callout variant="info" title="Definição de Fowler">
+"Refatoração é uma técnica disciplinada para reestruturar um corpo de código existente, alterando sua estrutura interna sem mudar seu comportamento externo."
+— Martin Fowler, *Refactoring*
+</Callout>
+
+## O problema
+
+Refatorar sem segurança é tão comum quanto perigoso. Os cenários clássicos:
+
+- Reescrever um módulo inteiro de uma vez, sem testes, e descobrir semanas depois que casos de borda foram perdidos
+- Renomear uma variável e quebrar algo em outro arquivo que ninguém lembrava que dependia dela
+- "Melhorar" a lógica enquanto corrige um bug e introduzir um novo bug no processo
+
+O problema não é a refatoração em si — é a ausência de uma rede de proteção e de passos pequenos.
+
+## A rede de proteção: testes
+
+Antes de qualquer refatoração, a pergunta essencial é: **como sei que não quebrei nada?**
+
+Se não há testes, a resposta honesta é "não sei". A solução é escrever testes *antes* de refatorar — não depois.
+
+```ts
+// Antes de refatorar calcularDesconto, escreva testes que
+// documentam o comportamento atual:
+describe("calcularDesconto", () => {
+  it("retorna 0 para usuário padrão", () => {
+    expect(calcularDesconto(100, usuarioPadrao)).toBe(0);
+  });
+
+  it("retorna 10% para usuário premium", () => {
+    expect(calcularDesconto(100, usuarioPremium)).toBe(10);
+  });
+
+  it("não aplica desconto negativo", () => {
+    expect(calcularDesconto(0, usuarioPremium)).toBe(0);
+  });
+});
+
+// Agora refatore. Se os testes continuarem passando, o comportamento
+// foi preservado.
+```
+
+## Passos pequenos
+
+A segunda regra da refatoração segura: faça uma coisa por vez e confirme que ainda funciona antes de continuar.
+
+<CompareGrid>
+<CodeBad title="Tudo de uma vez — difícil de rastrear erros">
+
+```ts
+// Em uma sessão: renomeei variáveis, extraí 3 métodos,
+// movi a classe para outro módulo e mudei a assinatura
+// de uma função pública. Se algo quebrou, onde foi?
+```
+
+</CodeBad>
+<CodeGood title="Um passo por vez — fácil de identificar e reverter">
+
+```ts
+// Passo 1: renomear variável e rodar testes → verde
+// Passo 2: extrair primeiro método e rodar testes → verde
+// Passo 3: extrair segundo método e rodar testes → vermelho!
+//          → só o passo 3 pode ter causado — revert fácil
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Refatorações mecânicas vs. criativas
+
+**Refatorações mecânicas** são seguras por natureza: renomear, mover, extrair método, inlinar variável. A lógica não muda — só a estrutura. IDEs modernas fazem muitas delas automaticamente.
+
+**Refatorações criativas** envolvem mudar o design: reorganizar responsabilidades, introduzir uma abstração, inverter uma dependência. Essas exigem mais cuidado e mais testes antes de começar.
+
+<Callout variant="atencao" title="Refatoração vs. mudança de comportamento">
+Se você perceber que precisa mudar o comportamento para refatorar corretamente, pare. Faça um commit com a refatoração pura primeiro, depois faça outra mudança com o novo comportamento. Misturar os dois dificulta code review e complica o git blame.
+</Callout>
+
+## O processo prático
+
+```
+1. Confirme que os testes existem e estão passando
+   → Se não existem, escreva-os antes de continuar
+
+2. Identifique um smell ou problema específico (não "tudo aqui está ruim")
+
+3. Aplique uma refatoração de cada vez
+
+4. Rode os testes após cada passo
+
+5. Se os testes ficarem vermelhos:
+   → Não avance. Entenda o que quebrou.
+   → Se necessário, reverta o passo e tente novamente.
+
+6. Faça commit quando os testes estiverem verdes e a mudança fizer sentido sozinha
+```
+
+## Quando *não* refatorar
+
+- **Antes de entender o código**: refatorar o que você não entende é reescrever às cegas
+- **Sem testes e sem tempo para escrevê-los**: o risco supera o benefício
+- **Ao mesmo tempo que corrige um bug**: misturar refatoração com correção dificulta entender o que resolveu o problema
+- **Em código que vai ser deletado**: não vale o investimento
+
+## Antes e depois: sessão de refatoração completa
+
+<CompareGrid>
+<CodeBad title="Código antes — funciona, mas está difícil de manter">
+
+```ts
+function v(u: any, p: any) {
+  if (!u || !u.e || !u.n) return false;
+  if (!p || p < 0 || p > 999999) return false;
+  if (u.b) return false; // bloqueado
+  return true;
+}
+```
+
+</CodeBad>
+<CodeGood title="Após refatoração — mesmo comportamento, mais legível">
+
+```ts
+function podeRealizarPagamento(usuario: Usuario, valor: number) {
+  if (!usuarioValido(usuario)) return false;
+  if (!valorValido(valor)) return false;
+  if (usuario.bloqueado) return false;
+  return true;
+}
+
+function usuarioValido(usuario: Usuario) {
+  return !!usuario?.email && !!usuario?.nome;
+}
+
+function valorValido(valor: number) {
+  const VALOR_MAXIMO = 999_999;
+  return valor >= 0 && valor <= VALOR_MAXIMO;
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+O comportamento é idêntico. Com testes cobrindo os casos de borda, você pode fazer essa transformação com confiança.
+
+## Conceitos relacionados
+
+- **Code Smells** — os sinais que indicam onde refatorar primeiro
+- **Extrair Método** — a refatoração individual mais usada na prática
+- **Separação de Responsabilidades** — o objetivo final de muitas sessões de refatoração

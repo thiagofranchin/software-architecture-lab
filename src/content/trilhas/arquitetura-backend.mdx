@@ -1,0 +1,174 @@
+---
+title: "Arquitetura Backend"
+slug: "arquitetura-backend"
+description: "Aprenda a estruturar APIs e serviços com clareza: separe lógica de negócio do acesso a dados, organize dependências corretamente e construa backends que resistem ao crescimento."
+category: "Backend"
+level: "Intermediário"
+duration: "3h"
+tags:
+  - backend
+  - repository
+  - service-layer
+  - dependency-injection
+  - camadas
+related:
+  - repository-pattern
+  - service-layer
+  - dependency-injection
+published: true
+order: 4
+---
+
+## Sobre esta trilha
+
+A trilha **Arquitetura Backend** responde a uma pergunta que aparece em todo backend que cresce: **onde coloco essa lógica?**
+
+Controllers que acumulam regras de negócio. Services que acessam o banco diretamente. Funções que criam suas próprias dependências e se tornam impossíveis de testar. Esses padrões aparecem cedo — e ficam cada vez mais caros de reverter conforme o sistema cresce.
+
+Aqui você vai aprender as três camadas que estruturam backends saudáveis: a **Service Layer** que orquestra o negócio, o **Repository Pattern** que isola o acesso a dados, e a **Injeção de Dependência** que conecta essas peças sem acoplamento rígido.
+
+<Callout variant="info" title="Para quem é">
+Desenvolvedores backend com experiência em Node.js, Python ou qualquer linguagem orientada a objetos que querem sair do "funciona mas está bagunçado" para "funciona e qualquer pessoa do time entende".
+</Callout>
+
+## O que você vai aprender
+
+- Como separar a lógica de negócio dos detalhes de infraestrutura (banco, HTTP, e-mail).
+- O que é a Service Layer e por que controllers não devem conter regras de negócio.
+- Como o Repository Pattern isola o acesso a dados e facilita testes.
+- Como a Injeção de Dependência elimina acoplamento entre camadas.
+- Como testar lógica de negócio sem banco de dados ou serviços externos.
+- Quais os sinais de que uma camada está fazendo trabalho demais.
+
+## Aulas
+
+<div className="flex flex-col gap-4">
+  <ConceptCard
+    order={1}
+    title="Repository Pattern"
+    description="Isole o acesso a dados atrás de uma interface clara. O Repository evita que lógica de banco vaze para o domínio da aplicação — e torna possível trocar o banco sem tocar nas regras de negócio."
+    slug="repository-pattern"
+    category="Backend"
+    level="Intermediário"
+    duration="15 min"
+  />
+
+  <ConceptCard
+    order={2}
+    title="Service Layer"
+    description="Centralize a lógica de negócio em serviços dedicados. A Service Layer evita que regras espalhadas por controllers e repositories tornem o sistema difícil de manter e de testar."
+    slug="service-layer"
+    category="Backend"
+    level="Intermediário"
+    duration="12 min"
+  />
+
+  <ConceptCard
+    order={3}
+    title="Injeção de Dependência"
+    description="Forneça dependências de fora para dentro. A Injeção de Dependência elimina o acoplamento entre quem usa e quem implementa — tornando o código testável e substituível sem reescrever nada."
+    slug="dependency-injection"
+    category="Backend"
+    level="Intermediário"
+    duration="14 min"
+  />
+</div>
+
+## As três camadas de um backend estruturado
+
+Um backend saudável opera em três camadas com responsabilidades distintas:
+
+| Camada | Responsabilidade | Não faz |
+|---|---|---|
+| **Controller** | Recebe e responde HTTP | Lógica de negócio |
+| **Service** | Orquestra regras de negócio | Acesso direto ao banco |
+| **Repository** | Persiste e recupera dados | Lógica de negócio |
+
+Quando cada camada respeita seu papel, o resultado prático é: você pode testar a lógica de negócio chamando o Service diretamente, sem precisar de uma requisição HTTP ou um banco real.
+
+<CompareGrid>
+<CodeBad title="Tudo no controller — impossível de reutilizar">
+
+```ts
+router.post("/pedidos", async (req, res) => {
+  const { usuarioId, itens } = req.body;
+
+  // validação de negócio
+  if (itens.length === 0) {
+    return res.status(400).json({ error: "Sem itens" });
+  }
+
+  // cálculo de negócio
+  const total = itens.reduce((s, i) => s + i.preco * i.qtd, 0);
+
+  // acesso ao banco
+  const pedido = await db.insert("pedidos", { usuarioId, total });
+
+  // envio de e-mail
+  await mailer.send(req.body.email, "Pedido criado");
+  res.json(pedido);
+});
+```
+
+</CodeBad>
+<CodeGood title="Camadas separadas — testável e reutilizável">
+
+```ts
+// Service: só lógica de negócio
+class PedidoService {
+  constructor(
+    private pedidoRepo: PedidoRepository,
+    private mailer: Mailer
+  ) {}
+
+  async criar(usuarioId: string, itens: Item[]) {
+    if (itens.length === 0) throw new Error("Sem itens");
+    const total = itens.reduce((s, i) => s + i.preco * i.qtd, 0);
+    const pedido = await this.pedidoRepo.save({ usuarioId, total });
+    await this.mailer.enviar(pedido.email, "Pedido criado");
+    return pedido;
+  }
+}
+
+// Controller: só HTTP
+router.post("/pedidos", async (req, res) => {
+  const pedido = await pedidoService.criar(
+    req.body.usuarioId,
+    req.body.itens
+  );
+  res.json(pedido);
+});
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Por que isso facilita testes
+
+O maior benefício prático de separar camadas é a testabilidade. Com as dependências injetadas por interface, você substitui implementações reais por doubles de teste:
+
+```ts
+// Teste unitário — sem banco, sem HTTP, sem e-mail
+const pedidoRepo = new PedidoRepositoryMemoria();
+const mailer = new MailerFake();
+const service = new PedidoService(pedidoRepo, mailer);
+
+await service.criar("usuario-1", [{ preco: 100, qtd: 2 }]);
+
+expect(pedidoRepo.todos()).toHaveLength(1);
+expect(mailer.enviados()).toContain("Pedido criado");
+```
+
+O teste roda em milissegundos, sem dependências externas — e falha exatamente quando a lógica de negócio está errada.
+
+<Callout variant="atencao" title="Não é sobre frameworks">
+Repository, Service Layer e Dependency Injection são padrões independentes de framework. Você pode aplicá-los em Express, Fastify, NestJS, Django ou qualquer outro — os princípios são os mesmos.
+</Callout>
+
+## Próximos passos
+
+Depois desta trilha, os caminhos naturais são:
+
+- **Design Patterns** — Strategy, Factory e Adapter se encaixam diretamente nas camadas que você acabou de aprender.
+- **Separação de Responsabilidades** — o princípio que fundamenta cada decisão de camada vista aqui.
+- **Acoplamento** — como medir e reduzir dependências entre os módulos do seu backend.

@@ -1,0 +1,189 @@
+---
+title: "Extrair Método"
+slug: "extrair-metodo"
+description: "Transforme blocos de código em funções com nome. Extrair método é a refatoração mais frequente — e a mais eficaz para reduzir complexidade e melhorar legibilidade."
+category: "Prática"
+level: "Intermediário"
+duration: "10 min"
+tags:
+  - refatoracao
+  - extrair-metodo
+  - legibilidade
+  - funcoes
+  - boas-praticas
+related:
+  - code-smells
+  - refatoracao-segura
+  - separacao-de-responsabilidades
+published: true
+order: 10
+---
+
+## Resumo
+
+**Extrair Método** (Extract Method/Function) é a refatoração de pegar um trecho de código dentro de uma função maior e movê-lo para uma função separada com um nome descritivo. É simples, mecânica, e provavelmente a refatoração mais poderosa do catálogo de Fowler.
+
+Um bom nome de função elimina comentários, documenta intenção e permite que o código seja lido como uma narrativa.
+
+<Callout variant="info" title="Quando o código precisa de comentário, considere extrair">
+Se você está prestes a escrever um comentário para explicar o que um bloco de código faz, esse bloco provavelmente merece um nome — não um comentário.
+</Callout>
+
+## O problema
+
+Funções longas são difíceis de entender porque misturam níveis de abstração e responsabilidades:
+
+```ts
+async function finalizarCheckout(carrinho: Carrinho, usuario: Usuario) {
+  // validar itens
+  if (carrinho.itens.length === 0) throw new Error("Carrinho vazio");
+  for (const item of carrinho.itens) {
+    if (item.quantidade <= 0) throw new Error(`Quantidade inválida: ${item.nome}`);
+    if (item.preco <= 0) throw new Error(`Preço inválido: ${item.nome}`);
+  }
+
+  // calcular total
+  let subtotal = 0;
+  for (const item of carrinho.itens) {
+    subtotal += item.preco * item.quantidade;
+  }
+  const desconto = usuario.isPremium() ? subtotal * 0.1 : 0;
+  const total = subtotal - desconto;
+
+  // criar pedido
+  const pedido = await pedidoRepository.criar({
+    usuarioId: usuario.id,
+    itens: carrinho.itens,
+    total,
+  });
+
+  // notificar
+  await emailService.enviar({
+    para: usuario.email,
+    assunto: "Pedido confirmado",
+    corpo: `Seu pedido #${pedido.id} foi criado. Total: R$ ${total}`,
+  });
+
+  return pedido;
+}
+```
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Tudo numa função — difícil de ler e testar">
+
+```ts
+function calcularPrecoFinal(produto: Produto, usuario: Usuario) {
+  let preco = produto.preco;
+
+  if (new Date() >= produto.promocaoInicio &&
+      new Date() <= produto.promocaoFim) {
+    preco = preco * (1 - produto.desconto);
+  }
+
+  if (usuario.plano === "premium" || usuario.totalCompras > 10000) {
+    preco = preco * 0.95;
+  }
+
+  if (preco < 0) preco = 0;
+
+  return Math.round(preco * 100) / 100;
+}
+```
+
+</CodeBad>
+<CodeGood title="Com métodos extraídos — cada função tem um propósito">
+
+```ts
+function calcularPrecoFinal(produto: Produto, usuario: Usuario) {
+  const precoComPromocao = aplicarPromocao(produto);
+  const precoComDesconto = aplicarDescontoFidelidade(precoComPromocao, usuario);
+  return arredondar(Math.max(0, precoComDesconto));
+}
+
+function aplicarPromocao(produto: Produto) {
+  const agora = new Date();
+  const emPromocao = agora >= produto.promocaoInicio &&
+                     agora <= produto.promocaoFim;
+  return emPromocao ? produto.preco * (1 - produto.desconto) : produto.preco;
+}
+
+function aplicarDescontoFidelidade(preco: number, usuario: Usuario) {
+  const DESCONTO_FIDELIDADE = 0.05;
+  return usuario.elegívelParaFidelidade()
+    ? preco * (1 - DESCONTO_FIDELIDADE)
+    : preco;
+}
+
+function arredondar(valor: number) {
+  return Math.round(valor * 100) / 100;
+}
+```
+
+</CodeGood>
+</CompareGrid>
+
+Além de mais legível, o segundo exemplo é testável por partes. Você pode testar `aplicarPromocao` sem precisar criar um usuário — e testar `aplicarDescontoFidelidade` sem precisar de um produto com promoção.
+
+## Como aplicar
+
+O processo é mecânico:
+
+1. **Identifique o bloco** a extrair — geralmente um grupo de linhas com um propósito único
+2. **Crie uma nova função** com um nome que descreve o que o bloco faz (não como)
+3. **Mova o código** para a nova função
+4. **Identifique os parâmetros** — tudo que o bloco ler de fora se torna parâmetro
+5. **Identifique o retorno** — tudo que o bloco escrever para fora se torna valor de retorno
+6. **Substitua** o bloco original pela chamada à nova função
+7. **Teste** que o comportamento não mudou
+
+Voltando ao exemplo do checkout:
+
+```ts
+// Após extrair métodos:
+async function finalizarCheckout(carrinho: Carrinho, usuario: Usuario) {
+  validarCarrinho(carrinho);
+  const total = calcularTotal(carrinho.itens, usuario);
+  const pedido = await criarPedido(carrinho, usuario, total);
+  await notificarUsuario(usuario, pedido, total);
+  return pedido;
+}
+```
+
+Agora a função lê como um índice — você entende o fluxo geral sem precisar ler os detalhes.
+
+## Quando usar
+
+Extraia um método quando:
+- Um bloco de código precisa de um comentário para ser entendido
+- Um trecho pode ser reutilizado em outro lugar
+- Uma função tem mais de um nível de abstração (mistura "o quê" com "como")
+- A função está ficando longa e difícil de ler de uma vez
+
+<Callout variant="atencao" title="Nomes ruins anulam o benefício">
+Extrair para `processarDados`, `fazerCoisas` ou `helper` não ajuda. O nome precisa revelar a intenção: `calcularImpostoSobreposto`, `validarDocumentoBrasileiro`, `normalizarTelefone`.
+</Callout>
+
+## Erros comuns
+
+**Extrair por tamanho, não por propósito:**
+Uma função de 5 linhas com três responsabilidades ainda é um problema. Extraia por coesão de propósito, não por contagem de linhas.
+
+**Parâmetros demais na função extraída:**
+Se a função extraída precisa de muitos parâmetros, é sinal de que o bloco extraído ainda é complexo demais ou que a função original está acoplada a muitos dados.
+
+**Extrair e deixar o nome ruim:**
+```ts
+// Extraído, mas o nome não ajuda
+function processar(itens: Item[]) { ... }
+
+// Com nome que documenta a intenção
+function calcularSubtotalComImposto(itens: Item[]) { ... }
+```
+
+## Conceitos relacionados
+
+- **Code Smells** — "função longa" é o smell mais comum que indica necessidade de extrair método
+- **Refatoração Segura** — como garantir que extrair método não quebra comportamento existente
+- **Separação de Responsabilidades** — extrair método é uma das implementações práticas desse princípio

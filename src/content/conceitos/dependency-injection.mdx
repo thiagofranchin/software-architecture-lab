@@ -1,0 +1,184 @@
+---
+title: "Injeção de Dependência"
+slug: "dependency-injection"
+description: "Forneça dependências de fora para dentro. A Injeção de Dependência elimina o acoplamento entre quem usa e quem implementa, tornando o código testável e substituível."
+category: "Backend"
+level: "Intermediário"
+duration: "14 min"
+tags:
+  - backend
+  - dependency-injection
+  - inversao-de-controle
+  - testabilidade
+  - acoplamento
+related:
+  - repository-pattern
+  - service-layer
+  - acoplamento
+published: true
+order: 8
+---
+
+## Resumo
+
+**Injeção de Dependência** (Dependency Injection, DI) é a prática de fornecer as dependências de uma classe de fora — em vez de deixá-la criar suas próprias. Quando `PedidoService` precisa de `PedidoRepository`, alguém de fora passa o repositório para ele. O Service não sabe qual implementação concreta vai receber — e não precisa saber.
+
+Essa inversão de controle é o que torna o código desacoplado, testável e flexível para mudança.
+
+<Callout variant="info" title="Princípio por trás">
+DI é a implementação prática do **Princípio da Inversão de Dependência** (o D do SOLID): módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de abstrações.
+</Callout>
+
+## O problema
+
+Sem injeção de dependência, as classes criam suas próprias dependências:
+
+```ts
+class PedidoService {
+  private repo = new PedidoRepositoryPostgres(); // hardcoded
+  private mailer = new SendGridMailer();           // hardcoded
+
+  async confirmar(id: string) {
+    const pedido = await this.repo.findById(id);
+    pedido.confirmar();
+    await this.repo.save(pedido);
+    await this.mailer.enviar(pedido.email, "Pedido confirmado");
+  }
+}
+```
+
+Problemas concretos:
+- Para testar `confirmar`, você precisa de PostgreSQL e SendGrid configurados
+- Trocar o banco ou o provedor de e-mail exige modificar `PedidoService`
+- Não é possível reutilizar o service com implementações diferentes
+
+## Antes e depois
+
+<CompareGrid>
+<CodeBad title="Dependência criada internamente — acoplamento rígido">
+
+```ts
+class RelatórioService {
+  // Acoplado à implementação concreta
+  private exportador = new ExportadorPDF();
+
+  async gerar(dados: Dados) {
+    const relatorio = this.processar(dados);
+    return this.exportador.exportar(relatorio);
+  }
+}
+
+// Não tem como gerar CSV ou Excel sem alterar a classe
+```
+
+</CodeBad>
+<CodeGood title="Dependência injetada — flexível e testável">
+
+```ts
+interface Exportador {
+  exportar(relatorio: Relatorio): Promise<Buffer>;
+}
+
+class RelatorioService {
+  constructor(private exportador: Exportador) {}
+
+  async gerar(dados: Dados) {
+    const relatorio = this.processar(dados);
+    return this.exportador.exportar(relatorio);
+  }
+}
+
+// Em produção:
+new RelatorioService(new ExportadorPDF());
+
+// Em teste:
+new RelatorioService(new ExportadorMemoria());
+
+// Para nova funcionalidade:
+new RelatorioService(new ExportadorCSV());
+```
+
+</CodeGood>
+</CompareGrid>
+
+## Formas de injetar dependências
+
+**Via construtor (recomendado):**
+```ts
+class PedidoService {
+  constructor(
+    private repo: PedidoRepository,
+    private mailer: Mailer
+  ) {}
+}
+```
+As dependências são obrigatórias, visíveis na assinatura e imutáveis após a criação. É a forma mais explícita e testável.
+
+**Via setter (casos específicos):**
+```ts
+class RelatorioService {
+  private exportador!: Exportador;
+
+  setExportador(e: Exportador) {
+    this.exportador = e;
+  }
+}
+```
+Útil quando a dependência é opcional ou pode mudar em tempo de execução. Menos comum.
+
+**Via container de DI (frameworks):**
+Frameworks como NestJS, InversifyJS e TSyringe automatizam a criação e injeção. Você declara o que precisa, o container resolve as dependências:
+```ts
+@Injectable()
+class PedidoService {
+  constructor(private repo: PedidoRepository) {} // NestJS injeta automaticamente
+}
+```
+
+## Quando usar
+
+Injeção de dependência é útil sempre que:
+- A classe precisa de colaboradores que podem variar (banco, API externa, serviço de e-mail)
+- Você quer testar a classe sem subir infraestrutura real
+- Diferentes ambientes precisam de implementações diferentes (ex: e-mail real em produção, e-mail em memória em teste)
+
+<Callout variant="atencao" title="DI não exige um framework">
+Você pode praticar injeção de dependência passando objetos no construtor, sem nenhuma biblioteca. O framework de DI é uma conveniência — o princípio é independente de ferramenta.
+</Callout>
+
+## Erros comuns
+
+**Injetar o container inteiro:**
+```ts
+// Errado: a classe pode puxar qualquer coisa do container
+constructor(private container: Container) {
+  this.repo = container.get(PedidoRepository);
+}
+
+// Correto: declare explicitamente o que precisa
+constructor(private repo: PedidoRepository) {}
+```
+
+**Depender de classes concretas, não de interfaces:**
+```ts
+// Errado: acoplado à implementação
+constructor(private repo: PedidoRepositoryPostgres) {}
+
+// Correto: depende da abstração
+constructor(private repo: PedidoRepository) {} // interface
+```
+
+**Criar dependências no meio do método:**
+```ts
+async confirmar(id: string) {
+  const mailer = new Mailer(); // dependência criada na hora
+  // ...
+}
+```
+Dependências criadas dentro de métodos são invisíveis, não testáveis e impossíveis de substituir.
+
+## Conceitos relacionados
+
+- **Repository Pattern** — exemplo clássico de uma dependência que se injeta por interface
+- **Service Layer** — beneficiária direta da injeção: recebe repositórios e serviços sem acoplamento
+- **Acoplamento** — o problema que a Injeção de Dependência resolve ao remover dependências diretas entre implementações

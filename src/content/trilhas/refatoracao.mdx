@@ -1,0 +1,143 @@
+---
+title: "Refatoração"
+slug: "refatoracao"
+description: "Aprenda a melhorar o código existente sem quebrar o que já funciona: reconheça sinais de alerta, aplique as refatorações mais eficazes e use testes como rede de proteção."
+category: "Prática"
+level: "Intermediário"
+duration: "2h 45min"
+tags:
+  - refatoracao
+  - qualidade
+  - code-smells
+  - testes
+  - boas-praticas
+related:
+  - code-smells
+  - extrair-metodo
+  - refatoracao-segura
+published: true
+order: 5
+---
+
+## Sobre esta trilha
+
+A trilha **Refatoração** existe para responder uma pergunta que todo desenvolvedor enfrenta: **o que faço com código que funciona mas está difícil de manter?**
+
+Refatorar não é reescrever. Não é uma tarefa que você agenda para "quando der tempo". E não é algo que você faz ao mesmo tempo que adiciona funcionalidades. Refatoração é uma prática disciplinada — feita com rede de proteção, em passos pequenos, com objetivo claro.
+
+Aqui você vai aprender a reconhecer quando o código está pedindo atenção, como aplicar as mudanças mais comuns de forma segura, e por que testes são o que separa refatoração de apostas.
+
+<Callout variant="info" title="Para quem é">
+Desenvolvedores que trabalham em código legado ou em bases que cresceram sem muito planejamento, e querem melhorar o design do código sem introduzir novos problemas.
+</Callout>
+
+## O que você vai aprender
+
+- O que são code smells e como identificá-los antes que virem problemas sérios.
+- Como extrair métodos para reduzir funções longas e melhorar a legibilidade.
+- Por que testes são indispensáveis antes de qualquer refatoração.
+- Como fazer mudanças em passos pequenos e reversíveis.
+- A diferença entre refatoração e mudança de comportamento — e por que misturá-las é perigoso.
+- Quando refatorar é a escolha certa — e quando não é.
+
+## Aulas
+
+<div className="flex flex-col gap-4">
+  <ConceptCard
+    order={1}
+    title="Code Smells"
+    description="Aprenda a reconhecer os sinais de que o código precisa de atenção. Code smells não são bugs — são indícios de que uma decisão de design está custando caro e vai custar mais com o tempo."
+    slug="code-smells"
+    category="Prática"
+    level="Intermediário"
+    duration="12 min"
+  />
+
+  <ConceptCard
+    order={2}
+    title="Extrair Método"
+    description="Transforme blocos de código em funções com nome. Extrair método é a refatoração mais frequente — e a mais eficaz para reduzir complexidade e melhorar a legibilidade do código."
+    slug="extrair-metodo"
+    category="Prática"
+    level="Intermediário"
+    duration="10 min"
+  />
+
+  <ConceptCard
+    order={3}
+    title="Refatoração Segura"
+    description="Mude a estrutura do código sem alterar seu comportamento. Refatoração segura usa testes como rede de proteção e passos pequenos que podem ser revertidos a qualquer momento."
+    slug="refatoracao-segura"
+    category="Prática"
+    level="Intermediário"
+    duration="15 min"
+  />
+</div>
+
+## Por que refatoração é uma habilidade separada
+
+É tentador tratar refatoração como consequência natural de "escrever código melhor". Na prática, ela exige um conjunto de habilidades específicas:
+
+- Saber **o que mudar** sem entender o problema (identificar smells)
+- Saber **como mudar** sem quebrar (técnicas de refatoração)
+- Saber **quando parar** (limites da sessão)
+- Saber **verificar** que nada quebrou (testes como rede)
+
+Sem essas habilidades, o que parece refatoração é, na prática, reescrita — com todos os riscos que isso implica.
+
+## O ciclo da refatoração segura
+
+```
+Testes verdes → Identificar smell → Aplicar uma refatoração
+→ Rodar testes → Testes verdes → Commit → Repetir
+```
+
+Cada ciclo é pequeno. Cada commit representa uma mudança que pode ser revertida sozinha. Se os testes ficam vermelhos, o problema está no passo que você acabou de dar — não em algum lugar indefinido de uma sessão longa.
+
+<CompareGrid>
+<CodeBad title="Refatoração sem rede — arriscada">
+
+```ts
+// Sessão de 4 horas sem commits intermediários:
+// - Renomeei 12 variáveis
+// - Extraí 5 funções
+// - Movi 2 classes
+// - Mudei a assinatura de 3 métodos públicos
+// Os testes agora falham. Onde foi?
+```
+
+</CodeBad>
+<CodeGood title="Refatoração com passos pequenos — segura">
+
+```ts
+// 09h00 — Renomear variável → testes verdes → commit
+// 09h10 — Extrair primeiro método → testes verdes → commit
+// 09h20 — Extrair segundo método → testes vermelhos!
+//         → entender o que quebrou → ajustar → testes verdes → commit
+// 09h35 — Mover classe → testes verdes → commit
+```
+
+</CodeGood>
+</CompareGrid>
+
+## A relação entre smells, técnicas e resultado
+
+| Smell detectado | Técnica aplicada | Resultado |
+|---|---|---|
+| Função longa | Extrair Método | Funções menores com propósito claro |
+| Comentário desnecessário | Renomear / Extrair Método | Código autodocumentado |
+| Número mágico | Extrair Constante | Intenção explícita no nome |
+| Classe com muitas responsabilidades | Extrair Classe | Responsabilidades separadas |
+| Feature Envy | Mover Método | Lógica no objeto que tem os dados |
+
+<Callout variant="atencao" title="Refatoração não substitui design">
+Refatoração melhora o código existente, mas não resolve problemas de design que deveriam ter sido tratados antes. Se a arquitetura está fundamentalmente errada, refatorar pode ser um caminho mais longo do que repensar o design.
+</Callout>
+
+## Próximos passos
+
+Depois desta trilha, os caminhos naturais são:
+
+- **Separação de Responsabilidades** e **Acoplamento** — os princípios que guiam as decisões de onde e como refatorar.
+- **Design Patterns** — padrões como Strategy e Factory frequentemente emergem como resultado natural de refatorações bem conduzidas.
+- **Fundamentos de Arquitetura** — para entender o que torna um código sustentável desde o início, antes de precisar refatorar.
