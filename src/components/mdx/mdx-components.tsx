@@ -1,7 +1,12 @@
 import Link from "next/link";
 import type { ComponentPropsWithoutRef } from "react";
 
+import { ArchComparator } from "@/components/content/arch-comparator";
 import { Callout } from "@/components/content/callout";
+import { DecisionCard } from "@/components/content/decision-card";
+import { DepVisualizer } from "@/components/content/dep-visualizer";
+import { Diagram } from "@/components/content/diagram";
+import { TradeoffTable } from "@/components/content/tradeoff-table";
 import { CategoryBadge } from "@/components/content/category-badge";
 import {
   CodeBad,
@@ -10,6 +15,8 @@ import {
   CompareGrid,
 } from "@/components/content/code-comparison";
 import { ConceptCard } from "@/components/content/concept-card";
+import { LayerSimulator } from "@/components/content/layer-simulator";
+import { Quiz } from "@/components/content/quiz";
 import { TrilhaCard } from "@/components/content/trilha-card";
 import { cn } from "@/lib/utils";
 
@@ -93,15 +100,28 @@ export const mdxComponents = {
       {...props}
     />
   ),
-  code: (props: ComponentPropsWithoutRef<"code">) => (
-    <code
-      className="rounded-md border border-border/50 bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground"
-      {...props}
-    />
-  ),
-  pre: (props: ComponentPropsWithoutRef<"pre">) => (
+  code: ({
+    "data-language": dataLanguage,
+    className,
+    ...props
+  }: ComponentPropsWithoutRef<"code"> & { "data-language"?: string }) => {
+    if (dataLanguage) {
+      return <code className={className} data-language={dataLanguage} {...props} />;
+    }
+    return (
+      <code
+        className="rounded-md border border-border/50 bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground"
+        {...props}
+      />
+    );
+  },
+  pre: ({
+    "data-language": dataLanguage,
+    ...props
+  }: ComponentPropsWithoutRef<"pre"> & { "data-language"?: string }) => (
     <pre
-      className="my-6 overflow-x-auto rounded-xl border border-border/60 bg-muted/60 p-4 font-mono text-sm leading-relaxed text-foreground"
+      className="my-6 overflow-x-auto rounded-xl border border-border/60 bg-muted/60 p-4 font-mono text-sm leading-relaxed"
+      data-language={dataLanguage}
       {...props}
     />
   ),
@@ -125,12 +145,19 @@ export const mdxComponents = {
   td: (props: ComponentPropsWithoutRef<"td">) => (
     <td className="border-b border-border/40 px-3 py-2 align-top" {...props} />
   ),
+  ArchComparator,
   Callout,
   CategoryBadge,
+  DecisionCard,
+  DepVisualizer,
+  Diagram,
+  TradeoffTable,
   CodeBad,
   CodeGood,
   CodeComparison,
   CompareGrid,
   ConceptCard,
+  LayerSimulator,
+  Quiz,
   TrilhaCard,
 };

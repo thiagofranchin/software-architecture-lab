@@ -122,6 +122,13 @@ Registrados em `src/components/mdx/mdx-components.tsx`:
 | `<CodeBad>` | `title` |
 | `<CodeGood>` | `title` |
 | `<CategoryBadge>` | `category` |
+| `<Diagram>` | `code` (string Mermaid) — client-side |
+| `<TradeoffTable>` | `rows: {criterio, opcaoA, opcaoB, vencedor?}[]`, `labelA?`, `labelB?` |
+| `<DecisionCard>` | `quando`, `evitar`, `alternativa?` — suporta JSX inline |
+| `<Quiz>` | `questions: {question, options: {label, correct?, explanation?}[]}[]`, `title?` — client-side |
+| `<ArchComparator>` | `defaultA?`, `defaultB?` — `"mvc" \| "clean" \| "hexagonal" \| "layered"` — client-side |
+| `<LayerSimulator>` | `items: {id, label, correctLayer}[]`, `title?` — drag & drop, client-side |
+| `<DepVisualizer>` | `nodes: {id, label, type?, layer?}[]`, `edges: {from, to, label?, dashed?}[]`, `title?` — client-side |
 
 ### Criando uma nova trilha
 

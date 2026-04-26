@@ -219,6 +219,17 @@
   --category-erro-foreground: oklch(1.0000 0 0);
 }
 
+/* Syntax highlight — shiki dual-theme (light/dark) */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

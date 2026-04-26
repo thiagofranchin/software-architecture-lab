@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
+import { TrilhasFilter } from "@/components/content/trilhas-filter";
 import { PageContainer } from "@/components/layout/page-container";
-import { TrilhaCard } from "@/components/content/trilha-card";
 import { getAllTrilhas } from "@/lib/content/loader";
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export default async function TrilhasPage() {
 
   return (
     <PageContainer className="py-16">
-      <header className="mb-12 max-w-3xl">
+      <header className="mb-10 max-w-3xl">
         <p className="font-mono text-xs tracking-widest text-primary uppercase">
           Aprendizado guiado
         </p>
@@ -34,21 +34,7 @@ export default async function TrilhasPage() {
           Nenhuma trilha publicada ainda. Volte em breve.
         </p>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2">
-          {trilhas.map((trilha) => (
-            <TrilhaCard
-              key={trilha.slug}
-              title={trilha.title}
-              description={trilha.description}
-              slug={trilha.slug}
-              category={trilha.category}
-              level={trilha.level}
-              duration={trilha.duration}
-              tags={trilha.tags}
-              order={trilha.order}
-            />
-          ))}
-        </div>
+        <TrilhasFilter trilhas={trilhas} />
       )}
     </PageContainer>
   );

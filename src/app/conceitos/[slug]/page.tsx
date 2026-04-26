@@ -4,10 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CategoryBadge } from "@/components/content/category-badge";
+import { PrevNextNav } from "@/components/content/prev-next-nav";
 import { RelatedContent } from "@/components/content/related-content";
 import { PageContainer } from "@/components/layout/page-container";
 import { MdxContent } from "@/components/mdx/mdx-content";
-import { getAllConceitos, getConceitoBySlug } from "@/lib/content/loader";
+import {
+  getAllConceitos,
+  getConceitoBySlug,
+  getConceitosInTrilha,
+  getTrilhaForConceito,
+} from "@/lib/content/loader";
 
 type Params = { slug: string };
 
@@ -44,6 +50,17 @@ export default async function ConceitoPage({
   const conceito = await getConceitoBySlug(slug);
   if (!conceito) notFound();
 
+  const trilha = await getTrilhaForConceito(slug);
+  const conceitosNaTrilha = trilha
+    ? await getConceitosInTrilha(trilha.slug)
+    : [];
+  const posicao = conceitosNaTrilha.findIndex((c) => c.slug === slug);
+  const prev = posicao > 0 ? conceitosNaTrilha[posicao - 1] : null;
+  const next =
+    posicao >= 0 && posicao < conceitosNaTrilha.length - 1
+      ? conceitosNaTrilha[posicao + 1]
+      : null;
+
   return (
     <PageContainer size="narrow" className="py-12">
       <Link
@@ -78,6 +95,15 @@ export default async function ConceitoPage({
       </article>
 
       <RelatedContent slugs={conceito.related} />
+
+      {trilha && (
+        <PrevNextNav
+          prev={prev ?? null}
+          next={next ?? null}
+          trilhaSlug={trilha.slug}
+          trilhaTitle={trilha.title}
+        />
+      )}
     </PageContainer>
   );
 }

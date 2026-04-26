@@ -162,6 +162,22 @@ Mostre o sintoma que aparece no código sem esse conceito.]
 
 **Conceitos relacionados**: use links reais `/conceitos/<slug>`. Não inclua slugs que não existem em `src/content/conceitos/`.
 
+## Componentes avançados disponíveis no MDX
+
+Use quando enriquecer a aula fizer sentido pedagógico:
+
+| Componente | Quando usar |
+|---|---|
+| `<Diagram code="..." />` | Diagramas Mermaid (flowchart, sequência, etc.) para visualizar fluxos e relações |
+| `<TradeoffTable rows={[...]} labelA="..." labelB="..." />` | Comparar duas abordagens em múltiplos critérios — excelente para padrões alternativos |
+| `<DecisionCard quando={...} evitar={...} alternativa={...} />` | Síntese de "quando usar / quando evitar / alternativa" no final da aula |
+| `<Quiz questions={[...]} title="..." />` | Quiz de fixação ao final da aula (múltipla escolha com feedback) |
+| `<ArchComparator defaultA="mvc" defaultB="clean" />` | Comparação interativa entre arquiteturas (MVC, Clean, Hexagonal, Layered) |
+| `<LayerSimulator items={[...]} title="..." />` | Exercício de arrastar responsabilidades para as camadas corretas |
+| `<DepVisualizer nodes={[...]} edges={[...]} title="..." />` | Visualizador de grafo de dependências entre módulos/classes |
+
+Todos os componentes interativos (`Quiz`, `ArchComparator`, `LayerSimulator`, `DepVisualizer`, `Diagram`) são client-side e não requerem nenhuma importação no MDX.
+
 ## Seções obrigatórias vs opcionais
 
 | Seção | Status |

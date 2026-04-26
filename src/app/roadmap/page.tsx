@@ -59,7 +59,7 @@ const phases: Phase[] = [
       "Componentes de trade-off e decisão arquitetural",
       "Navegação entre aulas dentro de uma trilha",
     ],
-    status: "planned",
+    status: "done",
   },
   {
     number: 4,
@@ -72,7 +72,7 @@ const phases: Phase[] = [
       "Visualizador de dependências",
       "Filtros avançados por nível e tag",
     ],
-    status: "planned",
+    status: "done",
   },
   {
     number: 5,
@@ -85,7 +85,7 @@ const phases: Phase[] = [
       "Trilha Refatoração",
       "Estudos de caso completos com React, Next.js e Node.js",
     ],
-    status: "planned",
+    status: "done",
   },
   {
     number: 6,

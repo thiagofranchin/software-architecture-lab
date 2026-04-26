@@ -3,43 +3,33 @@
 import { useMemo, useState } from "react";
 
 import { CategoryBadge } from "@/components/content/category-badge";
-import { ConceptCard } from "@/components/content/concept-card";
+import { TrilhaCard } from "@/components/content/trilha-card";
 import { cn } from "@/lib/utils";
 import {
   categories,
   levels,
   type Category,
-  type Conceito,
   type Level,
+  type Trilha,
 } from "@/types/content";
 
-type ConceptsFilterProps = {
-  conceitos: Conceito[];
+type TrilhasFilterProps = {
+  trilhas: Trilha[];
 };
 
-export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
+export function TrilhasFilter({ trilhas }: TrilhasFilterProps) {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activeLevel, setActiveLevel] = useState<Level | null>(null);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    for (const item of conceitos) {
-      for (const tag of item.tags) tags.add(tag);
-    }
-    return Array.from(tags).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [conceitos]);
 
   const filtered = useMemo(() => {
-    return conceitos.filter((item) => {
+    return trilhas.filter((item) => {
       if (activeCategory && item.category !== activeCategory) return false;
       if (activeLevel && item.level !== activeLevel) return false;
-      if (activeTag && !item.tags.includes(activeTag)) return false;
       return true;
     });
-  }, [activeCategory, activeLevel, activeTag, conceitos]);
+  }, [activeCategory, activeLevel, trilhas]);
 
-  const hasActiveFilter = activeCategory || activeLevel || activeTag;
+  const hasActiveFilter = activeCategory || activeLevel;
 
   return (
     <div className="space-y-4">
@@ -105,33 +95,6 @@ export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
         ))}
       </div>
 
-      {/* Filtro por tag */}
-      {allTags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground w-16 shrink-0">
-            Tags
-          </span>
-          {allTags.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() =>
-                setActiveTag((prev) => (prev === tag ? null : tag))
-              }
-              className={cn(
-                "rounded-full border px-3 py-1 font-mono text-xs transition",
-                activeTag === tag
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/70 text-muted-foreground hover:border-primary/50 hover:text-foreground",
-              )}
-              aria-pressed={activeTag === tag}
-            >
-              #{tag}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Limpar filtros */}
       {hasActiveFilter && (
         <button
@@ -139,7 +102,6 @@ export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
           onClick={() => {
             setActiveCategory(null);
             setActiveLevel(null);
-            setActiveTag(null);
           }}
           className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground transition"
         >
@@ -150,20 +112,21 @@ export function ConceptsFilter({ conceitos }: ConceptsFilterProps) {
       {/* Resultados */}
       {filtered.length === 0 ? (
         <p className="mt-6 text-sm text-muted-foreground">
-          Nenhum conceito encontrado para estes filtros.
+          Nenhuma trilha encontrada para estes filtros.
         </p>
       ) : (
-        <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((item) => (
-            <ConceptCard
-              key={item.slug}
-              title={item.title}
-              description={item.description}
-              slug={item.slug}
-              category={item.category}
-              level={item.level}
-              duration={item.duration}
-              order={item.order}
+        <div className="mt-2 grid gap-5 md:grid-cols-2">
+          {filtered.map((trilha) => (
+            <TrilhaCard
+              key={trilha.slug}
+              title={trilha.title}
+              description={trilha.description}
+              slug={trilha.slug}
+              category={trilha.category}
+              level={trilha.level}
+              duration={trilha.duration}
+              tags={trilha.tags}
+              order={trilha.order}
             />
           ))}
         </div>

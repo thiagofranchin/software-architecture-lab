@@ -62,3 +62,17 @@ export async function getRelatedConceitos(slugs: string[]) {
     .map((slug) => all.find((item) => item.slug === slug))
     .filter((item): item is ContentItem => Boolean(item));
 }
+
+export async function getTrilhaForConceito(conceitoSlug: string) {
+  const trilhas = await getAllTrilhas();
+  return trilhas.find((t) => t.related.includes(conceitoSlug)) ?? null;
+}
+
+export async function getConceitosInTrilha(trilhaSlug: string) {
+  const trilha = await getTrilhaBySlug(trilhaSlug);
+  if (!trilha) return [];
+  const all = await getAllConceitos();
+  return trilha.related
+    .map((slug) => all.find((c) => c.slug === slug))
+    .filter((c): c is ContentItem => Boolean(c));
+}
