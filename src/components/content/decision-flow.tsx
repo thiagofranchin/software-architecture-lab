@@ -1,4 +1,11 @@
 import { ArrowRight } from "lucide-react";
+import {
+  Children,
+  isValidElement,
+  type ReactNode,
+} from "react";
+
+import { cn } from "@/lib/utils";
 
 type DecisionFlowItem = {
   condition: string;
@@ -7,58 +14,43 @@ type DecisionFlowItem = {
 };
 
 type DecisionFlowProps = {
+  children?: ReactNode;
   question?: string;
   items?: DecisionFlowItem[];
 };
 
-const ITEM_COLORS = [
-  {
-    border: "border-sky-500/40",
-    bg: "bg-sky-500/8",
-    conditionColor: "text-sky-700 dark:text-sky-300",
-    solutionColor: "text-sky-900 dark:text-sky-100",
-    dot: "bg-sky-500",
-    arrow: "text-sky-500",
-  },
-  {
-    border: "border-violet-500/40",
-    bg: "bg-violet-500/8",
-    conditionColor: "text-violet-700 dark:text-violet-300",
-    solutionColor: "text-violet-900 dark:text-violet-100",
-    dot: "bg-violet-500",
-    arrow: "text-violet-500",
-  },
-  {
-    border: "border-amber-500/40",
-    bg: "bg-amber-500/8",
-    conditionColor: "text-amber-700 dark:text-amber-300",
-    solutionColor: "text-amber-900 dark:text-amber-100",
-    dot: "bg-amber-500",
-    arrow: "text-amber-500",
-  },
-  {
-    border: "border-teal-500/40",
-    bg: "bg-teal-500/8",
-    conditionColor: "text-teal-700 dark:text-teal-300",
-    solutionColor: "text-teal-900 dark:text-teal-100",
-    dot: "bg-teal-500",
-    arrow: "text-teal-500",
-  },
-  {
-    border: "border-rose-500/40",
-    bg: "bg-rose-500/8",
-    conditionColor: "text-rose-700 dark:text-rose-300",
-    solutionColor: "text-rose-900 dark:text-rose-100",
-    dot: "bg-rose-500",
-    arrow: "text-rose-500",
-  },
-];
+type DecisionFlowItemProps = DecisionFlowItem;
+
+export function DecisionFlowItem(_props: DecisionFlowItemProps) {
+  return null;
+}
 
 export function DecisionFlow({
+  children,
   question,
   items = [],
 }: DecisionFlowProps) {
-  if (!question && items.length === 0) {
+  const childItems = Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<DecisionFlowItemProps>(child)) {
+      return [];
+    }
+
+    if (!child.props.condition || !child.props.solution) {
+      return [];
+    }
+
+    return [
+      {
+        condition: child.props.condition,
+        solution: child.props.solution,
+        detail: child.props.detail,
+      },
+    ];
+  });
+
+  const resolvedItems = items.length > 0 ? items : childItems;
+
+  if (!question && resolvedItems.length === 0) {
     return null;
   }
 
@@ -69,38 +61,70 @@ export function DecisionFlow({
           {question}
         </p>
       )}
-      {items.length > 0 ? (
-        <div className="flex flex-col gap-2">
-          {items.map((item, index) => {
-            const color = ITEM_COLORS[index % ITEM_COLORS.length];
+      {resolvedItems.length > 0 ? (
+        <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/70 shadow-sm shadow-black/5 dark:border-border/80 dark:bg-card/55 dark:shadow-black/20">
+          <div className="bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-4 py-2 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-primary/80 dark:text-primary/75 sm:px-5">
+            Mapa de decisão
+          </div>
 
+          <div className="divide-y divide-border/45 px-4 py-3 sm:px-5">
+          {resolvedItems.map((item, index) => {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-3 rounded-xl border ${color.border} ${color.bg} px-4 py-3 transition-colors`}
+                className={cn(
+                  "py-3 first:pt-0 last:pb-0",
+                  "grid gap-x-4 gap-y-1.5",
+                  "sm:grid-cols-[minmax(0,1.2fr)_auto_minmax(0,1.45fr)] sm:items-center",
+                )}
               >
-                <span className={`size-2 shrink-0 rounded-full ${color.dot}`} />
                 <span
-                  className={`min-w-0 flex-1 text-sm font-medium ${color.conditionColor}`}
+                  className={cn(
+                    "min-w-0 font-mono text-[0.92rem] font-semibold text-foreground",
+                    "sm:text-[0.95rem]",
+                  )}
                 >
                   {item.condition}
                 </span>
-                <ArrowRight className={`size-4 shrink-0 ${color.arrow}`} />
-                <div className="min-w-0 flex-2 text-right sm:text-left">
-                  <span
-                    className={`text-sm font-semibold ${color.solutionColor}`}
-                  >
-                    {item.solution}
-                  </span>
-                  {item.detail ? (
-                    <span className="block text-xs text-muted-foreground">
-                      {item.detail}
+                <div className="hidden justify-center sm:flex">
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-primary/75"
+                  />
+                </div>
+                <div className="min-w-0 sm:text-left">
+                  <div className="flex items-start gap-2 sm:hidden">
+                    <ArrowRight
+                      aria-hidden="true"
+                      className="mt-0.5 size-4 shrink-0 text-primary/75"
+                    />
+                    <div className="min-w-0">
+                      <span className="font-mono text-[0.88rem] font-semibold text-foreground sm:text-[0.93rem]">
+                        {item.solution}
+                      </span>
+                      {item.detail ? (
+                        <span className="ml-1 font-mono text-[0.8rem] text-muted-foreground">
+                          ({item.detail})
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="hidden min-w-0 sm:block">
+                    <span className="font-mono text-[0.88rem] font-semibold text-foreground sm:text-[0.93rem]">
+                      {item.solution}
                     </span>
-                  ) : null}
+                    {item.detail ? (
+                      <span className="ml-1 font-mono text-[0.8rem] text-muted-foreground">
+                        ({item.detail})
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             );
           })}
+          </div>
         </div>
       ) : null}
     </div>

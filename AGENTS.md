@@ -125,10 +125,22 @@ Registrados em `src/components/mdx/mdx-components.tsx`:
 | `<Diagram>` | `code` (string Mermaid) — client-side |
 | `<TradeoffTable>` | `rows: {criterio, opcaoA, opcaoB, vencedor?}[]`, `labelA?`, `labelB?` |
 | `<DecisionCard>` | `quando`, `evitar`, `alternativa?` — suporta JSX inline |
+| `<DecisionFlow>` | `question?`, `items?` e children `<DecisionFlowItem>` |
+| `<DecisionFlowItem>` | `condition`, `solution`, `detail?` |
 | `<Quiz>` | `questions: {question, options: {label, correct?, explanation?}[]}[]`, `title?` — client-side |
 | `<ArchComparator>` | `defaultA?`, `defaultB?` — `"mvc" \| "clean" \| "hexagonal" \| "layered"` — client-side |
 | `<LayerSimulator>` | `items: {id, label, correctLayer}[]`, `title?` — drag & drop, client-side |
 | `<DepVisualizer>` | `nodes: {id, label, type?, layer?}[]`, `edges: {from, to, label?, dashed?}[]`, `title?` — client-side |
+
+### Regra para props estruturadas em MDX
+
+Evite arrays inline de objetos em componentes MDX autorais, como `items={[{...}]}` ou `rows={[{...}]}`, quando o componente puder receber conteúdo repetível por children. Esse formato pode compilar e ainda assim perder dados na serialização do MDX para RSC/HTML.
+
+Preferência do projeto:
+
+1. Use props simples para valores rasos
+2. Para listas estruturadas, prefira children explícitos como `<DecisionFlowItem />`
+3. Se um componente oferecer `items` e children, prefira children nos arquivos de conteúdo
 
 ### Criando uma nova trilha
 
@@ -159,8 +171,8 @@ Skills em `.claude/skills/` automatizam tarefas recorrentes neste projeto.
 | `/criar-trilha` | `.claude/skills/criar-trilha/SKILL.md` | Coleta título, categoria, nível, aulas e `order`; gera `src/content/trilhas/<slug>.mdx` com frontmatter validado e seções MDX padrão |
 | `/criar-conceito` | `.claude/skills/criar-conceito/SKILL.md` | Coleta dados da aula e trilha de destino; gera `src/content/conceitos/<slug>.mdx` com Resumo, Problema, Antes/depois, Quando usar, Erros comuns e Conceitos relacionados; oferece vincular o `ConceptCard` na trilha |
 | `/revisar-trilha` | `.claude/skills/revisar-trilha/SKILL.md` | Verifica frontmatter, slugs em `related`, props dos `ConceptCard` vs frontmatter real dos conceitos, `order` duplicado e links internos quebrados; emite relatório ✅ / ⚠️ / ❌ |
-| `/checar-conteudo` | `.claude/skills/checar-conteudo/SKILL.md` | Auditoria de todo `src/content/`: slugs e `order` duplicados, `category`/`level` com typo, referências cruzadas quebradas e rascunhos com `published: false` esquecidos |
-| `/criar-componente-mdx` | `.claude/skills/criar-componente-mdx/SKILL.md` | Cria o `.tsx` em `src/components/content/` seguindo padrões do projeto (Tailwind, variáveis CSS do tema, sem `"use client"` desnecessário) e registra no `mdx-components.tsx` |
+| `/checar-conteudo` | `.claude/skills/checar-conteudo/SKILL.md` | Auditoria de todo `src/content/`: slugs e `order` duplicados, `category`/`level` com typo, referências cruzadas quebradas, rascunhos com `published: false` esquecidos e props MDX complexas frágeis |
+| `/criar-componente-mdx` | `.claude/skills/criar-componente-mdx/SKILL.md` | Cria o `.tsx` em `src/components/content/` seguindo padrões do projeto (Tailwind, variáveis CSS do tema, sem `"use client"` desnecessário), registra no `mdx-components.tsx` e orienta APIs seguras para MDX com children estruturados |
 | `/criar-quiz` | `.claude/skills/criar-quiz/SKILL.md` | Apoia a criação de quizzes em MDX consistentes com o componente `<Quiz>` e com o tom didático do projeto |
 
 ## Agent Notes

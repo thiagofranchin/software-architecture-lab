@@ -18,6 +18,7 @@ Roda uma auditoria completa de todo o conteúdo em `src/content/` e reporta prob
 | ConceptCards com slug inexistente | `<ConceptCard slug="x">` onde `x` não existe em conceitos |
 | Links internos quebrados | `/conceitos/<slug>` ou `/trilhas/<slug>` no corpo MDX sem arquivo correspondente |
 | `published: false` esquecido | Arquivos com `published: false` que podem ter sido esquecidos |
+| Props MDX complexas frágeis | arrays inline de objetos em componentes MDX, com risco de sumirem na serialização |
 
 ## Passo a passo
 
@@ -89,6 +90,27 @@ grep -rln "^published: false" src/content/
 
 Liste-os no relatório como aviso; podem ser rascunhos esquecidos.
 
+### 8. Props complexas em componentes MDX
+
+Procure componentes usando arrays inline de objetos diretamente no MDX:
+
+```bash
+rg -n 'items=\[|rows=\[|questions=\[|nodes=\[|edges=\[' src/content
+```
+
+Para cada caso encontrado:
+- Verifique se o componente é conhecido por suportar esse formato com segurança
+- Se for um componente autoral com dados repetíveis, prefira recomendar children estruturados (`<ComponenteItem />`)
+- Se houver histórico de renderizar título sem itens, marque como **aviso importante** ou **erro**, conforme o impacto
+
+Exemplo de correção preferida:
+
+```mdx
+<DecisionFlow question="Quem precisa saber disso?">
+  <DecisionFlowItem condition="Só este componente?" solution="useState local" />
+</DecisionFlow>
+```
+
 ## Formato do relatório
 
 ```text
@@ -105,6 +127,7 @@ Liste-os no relatório como aviso; podem ser rascunhos esquecidos.
 ### ⚠️ Avisos (não quebram o site mas merecem atenção)
 - `src/content/trilhas/foo.mdx` e `src/content/trilhas/bar.mdx`: order 2 duplicado
 - `src/content/conceitos/draft.mdx`: published: false (rascunho esquecido?)
+- `src/content/conceitos/x.mdx`: `<MeuComponente items={[...]}>` usa prop complexa inline em MDX; prefira children estruturados
 
 ### ✅ OK
 - Nenhum slug duplicado encontrado
@@ -120,3 +143,4 @@ Se o usuário pedir para corrigir os erros encontrados, aplique as correções u
 1. Erros de frontmatter (typos em `category` ou `level`)
 2. Slugs quebrados em `related`
 3. `order` duplicado, consultando o usuário sobre a ordem desejada quando houver ambiguidade
+4. Props complexas frágeis em MDX, migrando para children estruturados quando o componente suportar esse formato

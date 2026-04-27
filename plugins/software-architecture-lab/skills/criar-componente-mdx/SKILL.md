@@ -11,6 +11,27 @@ Adiciona um novo componente React ao sistema MDX do projeto, tornando-o disponí
 
 Componentes MDX são registrados em `src/components/mdx/mdx-components.tsx`. Todo componente listado nesse arquivo pode ser usado diretamente nos arquivos `.mdx` sem `import`. O renderer é `next-mdx-remote` com suporte a JSX.
 
+## Regra importante para props complexas
+
+Evite depender de arrays inline de objetos como prop em MDX, por exemplo:
+
+```mdx
+<MeuComponente
+  items={[
+    { label: "A", value: "B" },
+    { label: "C", value: "D" },
+  ]}
+/>
+```
+
+Esse formato pode compilar e ainda assim perder parte dos dados na serialização do MDX para RSC e HTML. Quando o componente precisar de listas estruturadas, prefira:
+
+1. Children com subcomponentes explícitos, como `<MeuComponenteItem />`
+2. Props simples e rasas para valores unitários
+3. `items` apenas como fallback, não como única API voltada para autores MDX
+
+Se o componente aceita conteúdo repetível, crie também um subcomponente nulo tipado e registre ambos no `mdx-components.tsx`.
+
 ## Arquivos envolvidos
 
 | Arquivo | Papel |
@@ -66,6 +87,7 @@ Regras de implementação:
 - Cores: use variáveis CSS do tema (`text-foreground`, `bg-muted`, `border-border`, etc.), não cores hardcoded
 - Tipos React: importe de `react` quando necessário
 - Não use `"use client"` a menos que o componente precise de estado ou eventos de browser
+- Se houver coleção repetível de dados no MDX, ofereça API por children (`<ComponenteItem />`) além de props estruturadas
 
 Variáveis de cor disponíveis no tema:
 
@@ -130,10 +152,28 @@ Após criar, mostre ao usuário como o componente é usado em um arquivo `.mdx`:
 </NomeDoComponente>
 ```
 
+Para itens repetíveis, prefira documentar assim:
+
+```mdx
+<NomeDoComponente titulo="Exemplo">
+  <NomeDoComponenteItem label="A" value="B" />
+  <NomeDoComponenteItem label="C" value="D" />
+</NomeDoComponente>
+```
+
 ## Verificação final
 
 ```bash
 npm run lint
+npm run build
 ```
 
-Se houver erros de TypeScript ou lint, corrija antes de considerar o trabalho concluído.
+Além do build, quando houver props estruturadas, confira o HTML/RSC gerado:
+
+```bash
+rg -n "texto-esperado-do-componente" .next/server/app .next/server/chunks/ssr
+```
+
+Se o cabeçalho do componente aparecer mas os itens internos sumirem no HTML, trate isso como problema de serialização do MDX e migre o uso para children estruturados.
+
+Se houver erros de TypeScript, lint ou diferença entre o MDX e o HTML gerado, corrija antes de considerar o trabalho concluído.

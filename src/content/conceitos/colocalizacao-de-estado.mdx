@@ -35,14 +35,31 @@ Antes de decidir onde colocar um pedaço de estado, pergunte: **quem precisa sab
 
 <DecisionFlow
   question="Quem precisa saber disso?"
-  items={[
-    { condition: "Só este componente?", solution: "useState local" },
-    { condition: "Irmãos próximos?", solution: "Levantar ao pai mais próximo", detail: "lifting state up" },
-    { condition: "Uma subárvore inteira?", solution: "Context API com Provider localizado" },
-    { condition: "Dados do servidor?", solution: "React Query / SWR", detail: "não é estado, é cache" },
-    { condition: "Realmente global?", solution: "Zustand / Redux", detail: "login, tema, carrinho" },
-  ]}
-/>
+>
+  <DecisionFlowItem
+    condition="Só este componente?"
+    solution="useState local"
+  />
+  <DecisionFlowItem
+    condition="Irmãos próximos?"
+    solution="Levantar ao pai mais próximo"
+    detail="lifting state up"
+  />
+  <DecisionFlowItem
+    condition="Uma subárvore inteira?"
+    solution="Context API com Provider localizado"
+  />
+  <DecisionFlowItem
+    condition="Dados do servidor?"
+    solution="React Query / SWR"
+    detail="não é estado, é cache"
+  />
+  <DecisionFlowItem
+    condition="Realmente global?"
+    solution="Zustand / Redux"
+    detail="login, tema, carrinho"
+  />
+</DecisionFlow>
 
 <Callout variant="info" title="Estado do servidor não é estado do cliente">
 Dados buscados de uma API não são estado — são cache. Ferramentas como React Query e SWR existem exatamente para gerenciar esse cache separadamente, sem poluir o estado do cliente com dados que pertencem ao servidor.
