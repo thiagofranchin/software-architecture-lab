@@ -4,6 +4,7 @@ import type { ComponentPropsWithoutRef } from "react";
 import { ArchComparator } from "@/components/content/arch-comparator";
 import { Callout } from "@/components/content/callout";
 import { DecisionCard } from "@/components/content/decision-card";
+import { DecisionFlow } from "@/components/content/decision-flow";
 import { DepVisualizer } from "@/components/content/dep-visualizer";
 import { Diagram } from "@/components/content/diagram";
 import { ProcessStep, ProcessSteps } from "@/components/content/process-steps";
@@ -155,6 +156,7 @@ export const mdxComponents = {
   CategoryBadge,
   CometFlow,
   DecisionCard,
+  DecisionFlow,
   DepVisualizer,
   Diagram,
   OrbitDiagram,

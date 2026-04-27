@@ -4,6 +4,7 @@ import {
   Montserrat,
   Ubuntu_Mono,
 } from "next/font/google";
+import Script from "next/script";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import {
@@ -101,23 +102,11 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable}`}
     >
-      <head>
-        <script
-          id="theme-init"
-          dangerouslySetInnerHTML={{
-            __html: `(() => {
-              const storedTheme = localStorage.getItem("theme");
-              const theme = storedTheme === "light" || storedTheme === "dark"
-                ? storedTheme
-                : window.matchMedia("(prefers-color-scheme: dark)").matches
-                  ? "dark"
-                  : "light";
-              document.documentElement.classList.toggle("dark", theme === "dark");
-            })();`,
-          }}
-        />
-      </head>
       <body className="flex min-h-screen flex-col bg-background antialiased">
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+        >{`(()=>{try{var t=localStorage.getItem("theme");var d=t==="light"||t==="dark"?t:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.classList.toggle("dark",d==="dark")}catch(e){}})();`}</Script>
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
