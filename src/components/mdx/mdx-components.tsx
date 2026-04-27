@@ -128,7 +128,7 @@ export const mdxComponents = {
     ...props
   }: ComponentPropsWithoutRef<"pre"> & { "data-language"?: string }) => (
     <pre
-      className="my-6 overflow-x-auto rounded-xl border border-border/60 bg-muted/60 p-4 font-mono text-sm leading-relaxed"
+      className="code-scroll-shell code-scroll-x my-6 rounded-xl border border-border/60 bg-muted/60 p-4 font-mono text-sm leading-relaxed"
       data-language={dataLanguage}
       {...props}
     />

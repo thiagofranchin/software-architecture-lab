@@ -326,6 +326,131 @@ code[data-theme*=" "] span {
   }
 }
 
+/* ── Code horizontal scroll ────────────────────────────── */
+.code-scroll-shell,
+.code-scroll-frame > pre {
+  position: relative;
+  display: block;
+  padding-bottom: 0.7rem;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-primary) 46%, var(--color-card))
+    color-mix(in oklab, var(--color-muted) 72%, transparent);
+}
+
+.code-scroll-frame > pre {
+  margin: 0;
+  padding-top: 0;
+  padding-inline: 0;
+}
+
+.code-scroll-shell::before,
+.code-scroll-shell::after,
+.code-scroll-frame > pre::before,
+.code-scroll-frame > pre::after {
+  content: "";
+  position: sticky;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: block;
+  width: 1.75rem;
+  pointer-events: none;
+}
+
+.code-scroll-shell::before,
+.code-scroll-frame > pre::before {
+  left: 0;
+  float: left;
+  margin-right: -1.75rem;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-card) 92%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+.code-scroll-shell::after,
+.code-scroll-frame > pre::after {
+  right: 0;
+  float: right;
+  margin-left: -1.75rem;
+  background: linear-gradient(
+    270deg,
+    color-mix(in oklab, var(--color-card) 92%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+.code-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+}
+
+.code-scroll-shell,
+.code-scroll-frame > pre {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+}
+
+.code-scroll-x::-webkit-scrollbar {
+  height: 0.7rem;
+}
+
+.code-scroll-shell::-webkit-scrollbar,
+.code-scroll-frame > pre::-webkit-scrollbar,
+.code-scroll-x::-webkit-scrollbar {
+  height: 0.8rem;
+}
+
+.code-scroll-shell::-webkit-scrollbar-track,
+.code-scroll-frame > pre::-webkit-scrollbar-track,
+.code-scroll-x::-webkit-scrollbar-track {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-muted) 94%, var(--color-card)) 0%,
+      color-mix(in oklab, var(--color-border) 64%, var(--color-card)) 100%
+    );
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+}
+
+.code-scroll-shell::-webkit-scrollbar-thumb,
+.code-scroll-frame > pre::-webkit-scrollbar-thumb,
+.code-scroll-x::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-primary) 72%, var(--color-accent)) 0%,
+      color-mix(in oklab, var(--color-primary) 46%, var(--color-card)) 100%
+    )
+    padding-box;
+  min-width: 2.75rem;
+}
+
+.code-scroll-shell::-webkit-scrollbar-thumb:hover,
+.code-scroll-frame > pre::-webkit-scrollbar-thumb:hover,
+.code-scroll-x::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-primary) 84%, var(--color-accent)) 0%,
+      color-mix(in oklab, var(--color-primary) 58%, var(--color-card)) 100%
+    )
+    padding-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-scroll-x {
+    scroll-behavior: auto;
+  }
+}
+
 /* ── View Transitions ───────────────────────────────────── */
 @keyframes vt-fade-out {
   from { opacity: 1; }

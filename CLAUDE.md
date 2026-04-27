@@ -47,6 +47,7 @@ src/
 ├── components/
 │   ├── ui/                 # shadcn/ui components
 │   ├── content/            # ConceptCard, TrilhaCard, Callout, CategoryBadge, etc.
+│   ├── cosmic/             # Componentes animados temáticos (CometFlow, OrbitDiagram, BlackHoleDiagram, etc.)
 │   ├── layout/             # PageContainer, SiteHeader, SiteFooter
 │   └── mdx/                # MdxContent, MdxComponents (registry de componentes MDX)
 ├── content/                # Conteúdo MDX (trilhas e conceitos)
@@ -118,17 +119,25 @@ Registrados em `src/components/mdx/mdx-components.tsx`:
 | `<Callout>` | `variant: info \| atencao \| erro \| sucesso`, `title?` |
 | `<ConceptCard>` | `order? slug title description category level duration?` |
 | `<TrilhaCard>` | `slug title description category level duration?` |
-| `<CompareGrid>` | wrapper para CodeBad + CodeGood |
+| `<CompareGrid>` | wrapper para `<CodeBad>` + `<CodeGood>` |
 | `<CodeBad>` | `title` |
 | `<CodeGood>` | `title` |
+| `<CodeComparison>` | `titleBad`, `titleGood` — exibe os dois lados expandíveis lado a lado — client-side |
 | `<CategoryBadge>` | `category` |
 | `<Diagram>` | `code` (string Mermaid) — client-side |
 | `<TradeoffTable>` | `rows: {criterio, opcaoA, opcaoB, vencedor?}[]`, `labelA?`, `labelB?` |
 | `<DecisionCard>` | `quando`, `evitar`, `alternativa?` — suporta JSX inline |
+| `<DecisionFlow>` | `question?`, `items?: {condition, solution, detail?}[]` — aceita filhos `<DecisionFlowItem>` |
+| `<DecisionFlowItem>` | `condition`, `solution`, `detail?` — filho de `<DecisionFlow>` |
+| `<ProcessSteps>` | `title?`, `eyebrow?`, `description?`, `variant?: "default" \| "pratica"` — wrapper de `<ProcessStep>` |
+| `<ProcessStep>` | `title`, `step?`, `tone?: "default" \| "attention"`, `note?` — filho de `<ProcessSteps>` |
 | `<Quiz>` | `questions: {question, options: {label, correct?, explanation?}[]}[]`, `title?` — client-side |
 | `<ArchComparator>` | `defaultA?`, `defaultB?` — `"mvc" \| "clean" \| "hexagonal" \| "layered"` — client-side |
 | `<LayerSimulator>` | `items: {id, label, correctLayer}[]`, `title?` — drag & drop, client-side |
 | `<DepVisualizer>` | `nodes: {id, label, type?, layer?}[]`, `edges: {from, to, label?, dashed?}[]`, `title?` — client-side |
+| `<CometFlow>` | `nodes: {label, sublabel?}[]`, `title?`, `cometLabel?`, `duration?` — animação de fluxo — client-side |
+| `<OrbitDiagram>` | `title?`, `centerLabel?`, `centerColor?`, `layers?: {label, color, items}[]` — diagrama de camadas — client-side |
+| `<BlackHoleDiagram>` | `title?`, `centerLabel`, `satellites?: {label, coupling: "tight" \| "medium" \| "loose"}[]` — mapa de acoplamento — client-side |
 
 ### Criando uma nova trilha
 
