@@ -17,6 +17,8 @@ import Link from "next/link";
 import { AnimateOnScroll } from "@/components/cosmic/animate-on-scroll";
 import { CometDivider } from "@/components/cosmic/comet-divider";
 import { CosmicBackground } from "@/components/cosmic/cosmic-background";
+import { LcarsBar } from "@/components/cosmic/lcars-bar";
+import { WarpField } from "@/components/cosmic/warp-field";
 import { TrilhaCard } from "@/components/content/trilha-card";
 import { PageContainer } from "@/components/layout/page-container";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -146,53 +148,68 @@ export default async function Home() {
     <>
       <JsonLd schema={[schemaWebSite(), schemaOrganization()]} />
 
-      {/* ── Hero ────────────────────────────────────────────── */}
+      {/* ── Hero — ponte de comando ─────────────────────────── */}
       <section className="relative overflow-hidden bg-background">
         <CosmicBackground starCount={100} nebulaVariant="violet" />
-        {/* Linha separadora superior — horizonte de eventos */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent"
-        />
+        <WarpField streakCount={14} />
+        {/* Piso de holodeck em perspectiva 3D */}
+        <div aria-hidden="true" className="hud-grid" />
 
         <PageContainer className="relative py-24 sm:py-32">
-          <div className="mx-auto max-w-4xl rounded-2xl border border-border/50 bg-card/80 px-8 py-16 text-center shadow-2xl backdrop-blur-md sm:px-14 sm:py-20 dark:border-white/5 dark:bg-card/70">
+          <div className="relative mx-auto max-w-4xl rounded-2xl rounded-tl-[3rem] rounded-br-[3rem] border border-border/50 bg-card/80 px-8 py-16 text-center shadow-2xl backdrop-blur-md sm:px-14 sm:py-20 dark:border-primary/15 dark:bg-card/70">
+            {/* Moldura LCARS — cotovelos âmbar nos cantos */}
+            <span
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-20 w-2.5 rounded-tl-[3rem] rounded-br-full bg-primary/70"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-2.5 w-24 rounded-tl-[3rem] rounded-br-full bg-primary/70"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute bottom-0 right-0 h-20 w-2.5 rounded-br-[3rem] rounded-tl-full bg-accent/60"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute bottom-0 right-0 h-2.5 w-24 rounded-br-[3rem] rounded-tl-full bg-accent/60"
+            />
+
             {/* Badge de missão */}
-            <span className="mb-8 inline-flex items-center gap-2 rounded-sm border border-primary/25 bg-primary/8 px-4 py-1.5 font-mono text-[0.7rem] font-medium uppercase tracking-[0.18em] text-primary/80">
-              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-              Laboratório · 5 Trilhas · 15 Conceitos · 0 Teoria Vazia
+            <span className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 font-mono text-[0.7rem] font-medium uppercase tracking-[0.18em] text-primary/80">
+              <span className="lcars-blink size-1.5 rounded-full bg-primary" />
+              Diário de bordo · 5 trilhas · 15 conceitos · 0 teoria vazia
             </span>
 
-            {/* Título com gradiente cósmico */}
-            <h1 className="font-serif text-5xl font-black leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
+            {/* Título com gradiente LCARS */}
+            <h1 className="font-serif text-5xl font-bold uppercase leading-[1.05] tracking-[0.02em] sm:text-6xl lg:text-7xl">
               <span className="text-gradient-cosmic">
-                Explore o universo
+                Arquitetura de software:
               </span>
               <br />
-              <span className="text-foreground">
-                da arquitetura de software
-              </span>
+              <span className="text-foreground">a fronteira final</span>
             </h1>
 
             <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-              Aprenda de forma <strong className="text-foreground font-semibold">visual</strong>,{" "}
-              <strong className="text-foreground font-semibold">progressiva</strong> e{" "}
-              <strong className="text-foreground font-semibold">aplicável</strong> — do
-              frontend ao backend, com diagramas, comparativos e exercícios reais.
+              Aprenda <strong className="text-foreground font-semibold">vendo</strong>,{" "}
+              <strong className="text-foreground font-semibold">comparando</strong> e{" "}
+              <strong className="text-foreground font-semibold">praticando</strong>.
+              Trilhas curtas e diretas, do frontend ao backend — com diagramas,
+              código antes/depois e exercícios.
             </p>
 
             {/* CTAs */}
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/trilhas"
-                className={cn(buttonVariants({ variant: "default", size: "lg" }), "gap-2 px-6")}
+                className={cn(buttonVariants({ variant: "default", size: "lg" }), "gap-2 rounded-full px-7")}
               >
                 <Rocket className="size-4" aria-hidden />
-                Iniciar exploração
+                Ativar dobra
               </Link>
               <Link
                 href="/conceitos"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "px-6")}
+                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "rounded-full px-7")}
               >
                 Ver conceitos
                 <ArrowRight className="size-4" aria-hidden />
@@ -264,7 +281,7 @@ export default async function Home() {
               <p className="mb-3 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-primary/70">
                 [ Mapa de Bordo ]
               </p>
-              <h2 className="font-serif text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold uppercase tracking-[0.02em] text-foreground sm:text-4xl">
                 Setores que você vai explorar
               </h2>
               <p className="mt-3 text-base text-muted-foreground">
@@ -278,7 +295,7 @@ export default async function Home() {
               <AnimateOnScroll key={sector.title} delay={i * 60}>
                 <article
                   className={cn(
-                    "group flex h-full flex-col gap-3 rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5",
+                    "card-3d group flex h-full flex-col gap-3 rounded-2xl rounded-tl-[1.75rem] border border-border/70 bg-card p-5 shadow-sm",
                     sector.glow,
                     sector.border,
                   )}
@@ -317,7 +334,7 @@ export default async function Home() {
               <p className="mb-3 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-primary/70">
                 [ Protocolo de Exploração ]
               </p>
-              <h2 className="font-serif text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold uppercase tracking-[0.02em] text-foreground sm:text-4xl">
                 Como a exploração funciona
               </h2>
               <p className="mt-3 text-base text-muted-foreground">
@@ -329,7 +346,7 @@ export default async function Home() {
           <div className="grid gap-5 md:grid-cols-2">
             {explorationMethods.map((item, i) => (
               <AnimateOnScroll key={item.title} delay={i * 80}>
-                <article className="flex gap-4 rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm">
+                <article className="card-3d flex gap-4 rounded-2xl rounded-bl-[1.75rem] border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm">
                   <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <item.icon aria-hidden="true" className="size-4.5" />
                   </div>
@@ -359,7 +376,7 @@ export default async function Home() {
                 <p className="mb-2 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-primary/70">
                   [ Rotas de Exploração ]
                 </p>
-                <h2 className="font-serif text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                <h2 className="font-serif text-3xl font-bold uppercase tracking-[0.02em] text-foreground sm:text-4xl">
                   Trilhas recomendadas
                 </h2>
                 <p className="mt-3 text-base text-muted-foreground">
@@ -404,13 +421,22 @@ export default async function Home() {
       {/* ── CTA final ───────────────────────────────────────── */}
       <section className="pb-24">
         <PageContainer size="narrow">
-          <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm dark:border-white/5">
+          <div className="relative overflow-hidden rounded-3xl rounded-tr-[3rem] border border-border/60 bg-card p-10 text-center shadow-sm dark:border-primary/15">
             <CosmicBackground starCount={30} nebulaVariant="violet" className="opacity-50" />
+            <span
+              aria-hidden="true"
+              className="absolute right-0 top-0 h-16 w-2 rounded-tr-[3rem] rounded-bl-full bg-primary/60"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute right-0 top-0 h-2 w-20 rounded-tr-[3rem] rounded-bl-full bg-primary/60"
+            />
             <div className="relative">
+              <LcarsBar heightClass="h-[4px]" className="mx-auto mb-6 max-w-xs" />
               <p className="mb-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-primary/70">
                 [ Status da Missão ]
               </p>
-              <h2 className="font-serif text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              <h2 className="font-serif text-2xl font-bold uppercase tracking-[0.02em] text-foreground sm:text-3xl">
                 Quer entender a proposta do projeto?
               </h2>
               <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
