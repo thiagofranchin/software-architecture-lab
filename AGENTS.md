@@ -63,15 +63,17 @@ src/
 
 ### Key Architectural Decisions
 
-**Theme System**: Dark/light mode is implemented using CSS classes (`dark` class on `<html>`) combined with Tailwind's dark mode utilities. The theme preference is persisted in localStorage and respects system preferences as fallback.
+**Theme System**: Dark/light mode is implemented using CSS classes (`dark` class on `<html>`) combined with Tailwind's dark mode utilities. The theme preference is persisted in localStorage; **dark mode is the default** (LCARS bridge aesthetic) — light mode only when explicitly chosen.
 
 - Theme initialization happens via inline script in `layout.tsx` (runs before hydration to prevent flash)
 - The `ThemeToggle` component manages theme switching and persistence
 - All colors use CSS variables defined in the theme layer for consistency
 
+**Visual identity (Star Trek / LCARS)**: The design system follows the LCARS panel aesthetic from Star Trek — deep-black background with amber/lavender/blue accents, pill-shaped nav buttons, segmented decorative bars (`LcarsBar`), elbow corner frames, stardate readouts (`Stardate`), warp-speed streaks (`WarpField`) and a 3D perspective holodeck grid (`.hud-grid`). Cards use the `.card-3d` utility for a subtle 3D tilt on hover. All LCARS utilities live in `globals.css`; decorative components live in `src/components/cosmic/`.
+
 **Typography**: The app uses three Google Fonts configured as CSS variables:
 - `--font-montserrat` (sans-serif, primary)
-- `--font-merriweather` (serif, display)
+- `--font-antonio` (condensed display, LCARS-style — mapped to Tailwind's `font-serif`)
 - `--font-ubuntu-mono` (monospace, code)
 
 **Component Library**: shadcn/ui components are configured to use the `base-nova` style with neutral colors and CSS variables. Import alias: `@/components/ui`.

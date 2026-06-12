@@ -20,12 +20,10 @@ function applyTheme(theme: Theme) {
 }
 
 function readTheme(): Theme {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  // Modo escuro é o padrão — a ponte da Enterprise opera com as luzes baixas
+  return stored === "light" ? "light" : "dark";
 }
 
 function subscribe(callback: () => void) {
@@ -41,7 +39,7 @@ export function ThemeToggle({
   const theme = useSyncExternalStore(
     subscribe,
     readTheme,
-    () => "light" as Theme,
+    () => "dark" as Theme,
   );
 
   function toggleTheme() {

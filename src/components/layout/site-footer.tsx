@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { CosmicBackground } from "@/components/cosmic/cosmic-background";
+import { LcarsBar } from "@/components/cosmic/lcars-bar";
+import { Stardate } from "@/components/cosmic/stardate";
 import { PageContainer } from "@/components/layout/page-container";
 
 const footerNav = {
@@ -23,18 +25,16 @@ export function SiteFooter() {
       {/* Campo estelar sutil no footer */}
       <CosmicBackground starCount={35} nebulaVariant="none" className="opacity-40 dark:opacity-60" />
 
-      {/* Separador gradiente — horizonte cósmico */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent"
-      />
+      <PageContainer className="relative pt-4">
+        <LcarsBar heightClass="h-[5px]" />
+      </PageContainer>
 
       <PageContainer className="relative py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {/* Identidade */}
           <div className="space-y-3">
             <Link
-              className="group font-serif text-base font-black tracking-tight"
+              className="group font-serif text-lg font-bold uppercase tracking-[0.08em]"
               href="/"
             >
               <span className="text-primary transition-[text-shadow] group-hover:[text-shadow:0_0_10px_var(--color-primary)]">
@@ -47,7 +47,7 @@ export function SiteFooter() {
               Um laboratório visual e prático para explorar arquitetura de
               software em projetos reais.
             </p>
-            <p className="font-mono text-[0.65rem] uppercase tracking-[0.15em] text-muted-foreground/50">
+            <p className="lcars-readout text-muted-foreground/50">
               Explore. Aprenda. Construa.
             </p>
           </div>
@@ -55,7 +55,11 @@ export function SiteFooter() {
           {/* Links de navegação */}
           {Object.entries(footerNav).map(([heading, items]) => (
             <div key={heading} className="space-y-3">
-              <h2 className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-muted-foreground/70">
+              <h2 className="flex items-center gap-2 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-muted-foreground/70">
+                <span
+                  aria-hidden="true"
+                  className="h-3 w-1.5 rounded-full bg-primary/60"
+                />
                 {heading}
               </h2>
               <ul className="space-y-2">
@@ -76,8 +80,9 @@ export function SiteFooter() {
 
         {/* Rodapé inferior */}
         <div className="mt-10 flex flex-col gap-2 border-t border-border/40 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between dark:border-white/5">
-          <p>
-            © {year} Software Architecture Lab · Setor Terra · Quadrante Sul
+          <p className="flex flex-wrap items-center gap-x-2">
+            <span>© {year} Software Architecture Lab · NCC-2266</span>
+            <Stardate />
           </p>
           <p className="font-mono tracking-wide">
             Construído com ❤️ por Thiago Franchin

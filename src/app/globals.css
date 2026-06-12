@@ -45,8 +45,8 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  --font-serif: var(--font-merriweather);
-  --radius: 0.625rem;
+  --font-serif: var(--font-antonio);
+  --radius: 0.75rem;
   --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
   --tracking-tight: calc(var(--tracking-normal) - 0.025em);
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
@@ -87,38 +87,39 @@
 }
 
 :root {
-  --background: oklch(0.9856 0.0084 56.3169);
-  --foreground: oklch(0.3353 0.0132 2.7676);
+  /* ── Federation daylight — casco de nave, cinza-frio ── */
+  --background: oklch(0.9750 0.0045 260);
+  --foreground: oklch(0.2800 0.0200 268);
   --card: oklch(1.0000 0 0);
-  --card-foreground: oklch(0.3353 0.0132 2.7676);
+  --card-foreground: oklch(0.2800 0.0200 268);
   --popover: oklch(1.0000 0 0);
-  --popover-foreground: oklch(0.3353 0.0132 2.7676);
-  --primary: oklch(0.7357 0.1641 34.7091);
+  --popover-foreground: oklch(0.2800 0.0200 268);
+  --primary: oklch(0.6300 0.1550 55);
   --primary-foreground: oklch(1.0000 0 0);
-  --secondary: oklch(0.9596 0.0200 28.9029);
-  --secondary-foreground: oklch(0.5587 0.1294 32.7364);
-  --muted: oklch(0.9656 0.0176 39.4009);
-  --muted-foreground: oklch(0.5534 0.0116 58.0708);
-  --accent: oklch(0.8278 0.1131 57.9984);
-  --accent-foreground: oklch(0.3353 0.0132 2.7676);
+  --secondary: oklch(0.9300 0.0180 290);
+  --secondary-foreground: oklch(0.4200 0.0750 300);
+  --muted: oklch(0.9480 0.0080 262);
+  --muted-foreground: oklch(0.5000 0.0200 266);
+  --accent: oklch(0.6200 0.1200 320);
+  --accent-foreground: oklch(1.0000 0 0);
   --destructive: oklch(0.6122 0.2082 22.2410);
-  --border: oklch(0.9296 0.0370 38.6868);
-  --input: oklch(0.9296 0.0370 38.6868);
-  --ring: oklch(0.7357 0.1641 34.7091);
-  --chart-1: oklch(0.7357 0.1641 34.7091);
-  --chart-2: oklch(0.8278 0.1131 57.9984);
-  --chart-3: oklch(0.8773 0.0763 54.9314);
-  --chart-4: oklch(0.8200 0.1054 40.8859);
-  --chart-5: oklch(0.6368 0.1306 32.0721);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.9656 0.0176 39.4009);
-  --sidebar-foreground: oklch(0.3353 0.0132 2.7676);
-  --sidebar-primary: oklch(0.7357 0.1641 34.7091);
+  --border: oklch(0.9000 0.0120 268);
+  --input: oklch(0.9000 0.0120 268);
+  --ring: oklch(0.6300 0.1550 55);
+  --chart-1: oklch(0.6300 0.1550 55);
+  --chart-2: oklch(0.6200 0.1200 320);
+  --chart-3: oklch(0.6200 0.1300 258);
+  --chart-4: oklch(0.7000 0.1300 205);
+  --chart-5: oklch(0.6800 0.1400 162);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.9480 0.0080 262);
+  --sidebar-foreground: oklch(0.2800 0.0200 268);
+  --sidebar-primary: oklch(0.6300 0.1550 55);
   --sidebar-primary-foreground: oklch(1.0000 0 0);
-  --sidebar-accent: oklch(0.8278 0.1131 57.9984);
-  --sidebar-accent-foreground: oklch(0.3353 0.0132 2.7676);
-  --sidebar-border: oklch(0.9296 0.0370 38.6868);
-  --sidebar-ring: oklch(0.7357 0.1641 34.7091);
+  --sidebar-accent: oklch(0.6200 0.1200 320);
+  --sidebar-accent-foreground: oklch(1.0000 0 0);
+  --sidebar-border: oklch(0.9000 0.0120 268);
+  --sidebar-ring: oklch(0.6300 0.1550 55);
   --destructive-foreground: oklch(1.0000 0 0);
   --shadow-color: hsl(0 0% 0%);
   --shadow-opacity: 0.09;
@@ -137,18 +138,18 @@
   --shadow-xl: 0px 6px 12px -3px hsl(0 0% 0% / 0.09), 0px 8px 10px -4px hsl(0 0% 0% / 0.09);
   --shadow-2xl: 0px 6px 12px -3px hsl(0 0% 0% / 0.22);
   --tracking-normal: 0em;
-  --category-fundamentos: oklch(0.7357 0.1641 34.7091);
+  --category-fundamentos: oklch(0.5500 0.1500 258);
   --category-fundamentos-foreground: oklch(1.0000 0 0);
-  --category-frontend: oklch(0.8278 0.1131 57.9984);
-  --category-frontend-foreground: oklch(0.3353 0.0132 2.7676);
-  --category-backend: oklch(0.6368 0.1306 32.0721);
+  --category-frontend: oklch(0.5800 0.1200 205);
+  --category-frontend-foreground: oklch(1.0000 0 0);
+  --category-backend: oklch(0.5600 0.1300 162);
   --category-backend-foreground: oklch(1.0000 0 0);
-  --category-patterns: oklch(0.8773 0.0763 54.9314);
-  --category-patterns-foreground: oklch(0.3353 0.0132 2.7676);
-  --category-pratica: oklch(0.5800 0.1100 70.0000);
+  --category-patterns: oklch(0.5500 0.1800 292);
+  --category-patterns-foreground: oklch(1.0000 0 0);
+  --category-pratica: oklch(0.6300 0.1550 55);
   --category-pratica-foreground: oklch(1.0000 0 0);
-  --category-alerta: oklch(0.8200 0.1054 40.8859);
-  --category-alerta-foreground: oklch(0.3353 0.0132 2.7676);
+  --category-alerta: oklch(0.7000 0.1300 70);
+  --category-alerta-foreground: oklch(0.2800 0.0200 268);
   --category-erro: oklch(0.6122 0.2082 22.2410);
   --category-erro-foreground: oklch(1.0000 0 0);
 
@@ -161,40 +162,40 @@
 }
 
 .dark {
-  /* ── Deep space palette ─────────────────────────────── */
-  --background: oklch(0.12 0.025 255);
-  --foreground: oklch(0.92 0.015 215);
-  --card: oklch(0.17 0.028 252);
-  --card-foreground: oklch(0.92 0.015 215);
-  --popover: oklch(0.17 0.028 252);
-  --popover-foreground: oklch(0.92 0.015 215);
-  --primary: oklch(0.7357 0.1641 34.7091);
-  --primary-foreground: oklch(1.0000 0 0);
-  --secondary: oklch(0.22 0.030 252);
-  --secondary-foreground: oklch(0.92 0.015 215);
-  --muted: oklch(0.15 0.022 252);
-  --muted-foreground: oklch(0.63 0.022 230);
-  --accent: oklch(0.8278 0.1131 57.9984);
-  --accent-foreground: oklch(0.12 0.025 255);
+  /* ── LCARS bridge — preto profundo + âmbar dourado ──── */
+  --background: oklch(0.10 0.018 268);
+  --foreground: oklch(0.93 0.014 80);
+  --card: oklch(0.145 0.022 264);
+  --card-foreground: oklch(0.93 0.014 80);
+  --popover: oklch(0.145 0.022 264);
+  --popover-foreground: oklch(0.93 0.014 80);
+  --primary: oklch(0.78 0.1450 65);
+  --primary-foreground: oklch(0.12 0.020 268);
+  --secondary: oklch(0.23 0.040 288);
+  --secondary-foreground: oklch(0.90 0.025 300);
+  --muted: oklch(0.16 0.020 264);
+  --muted-foreground: oklch(0.67 0.025 78);
+  --accent: oklch(0.73 0.0950 320);
+  --accent-foreground: oklch(0.12 0.020 268);
   --destructive: oklch(0.6122 0.2082 22.2410);
-  --border: oklch(0.25 0.028 250);
-  --input: oklch(0.25 0.028 250);
-  --ring: oklch(0.7357 0.1641 34.7091);
-  --chart-1: oklch(0.7357 0.1641 34.7091);
-  --chart-2: oklch(0.8278 0.1131 57.9984);
-  --chart-3: oklch(0.8773 0.0763 54.9314);
-  --chart-4: oklch(0.8200 0.1054 40.8859);
-  --chart-5: oklch(0.6368 0.1306 32.0721);
-  --sidebar: oklch(0.12 0.025 255);
-  --sidebar-foreground: oklch(0.92 0.015 215);
-  --sidebar-primary: oklch(0.7357 0.1641 34.7091);
-  --sidebar-primary-foreground: oklch(1.0000 0 0);
-  --sidebar-accent: oklch(0.8278 0.1131 57.9984);
-  --sidebar-accent-foreground: oklch(0.12 0.025 255);
-  --sidebar-border: oklch(0.25 0.028 250);
-  --sidebar-ring: oklch(0.7357 0.1641 34.7091);
+  --border: oklch(0.27 0.030 272);
+  --input: oklch(0.27 0.030 272);
+  --ring: oklch(0.78 0.1450 65);
+  --chart-1: oklch(0.78 0.1450 65);
+  --chart-2: oklch(0.73 0.0950 320);
+  --chart-3: oklch(0.70 0.1300 258);
+  --chart-4: oklch(0.70 0.1600 205);
+  --chart-5: oklch(0.68 0.1500 162);
+  --sidebar: oklch(0.10 0.018 268);
+  --sidebar-foreground: oklch(0.93 0.014 80);
+  --sidebar-primary: oklch(0.78 0.1450 65);
+  --sidebar-primary-foreground: oklch(0.12 0.020 268);
+  --sidebar-accent: oklch(0.73 0.0950 320);
+  --sidebar-accent-foreground: oklch(0.12 0.020 268);
+  --sidebar-border: oklch(0.27 0.030 272);
+  --sidebar-ring: oklch(0.78 0.1450 65);
   --destructive-foreground: oklch(1.0000 0 0);
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --shadow-color: hsl(0 0% 0%);
   --shadow-opacity: 0.22;
   --shadow-blur: 12px;
@@ -221,8 +222,8 @@
   --category-backend-foreground: oklch(0.12 0.025 255);
   --category-patterns: oklch(0.63 0.20 292);
   --category-patterns-foreground: oklch(1.0000 0 0);
-  --category-pratica: oklch(0.7357 0.1641 34.7091);
-  --category-pratica-foreground: oklch(0.12 0.025 255);
+  --category-pratica: oklch(0.78 0.1450 65);
+  --category-pratica-foreground: oklch(0.12 0.020 268);
   --category-alerta: oklch(0.8200 0.1054 40.8859);
   --category-alerta-foreground: oklch(0.12 0.025 255);
   --category-erro: oklch(0.6122 0.2082 22.2410);
@@ -308,12 +309,95 @@ code[data-theme*=" "] span {
   animation: cosmic-drift var(--drift-duration, 8s) ease-in-out infinite;
 }
 
-/* Gradient text helper */
+/* Gradient text helper — âmbar LCARS para lavanda */
 .text-gradient-cosmic {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #c084fc 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ── LCARS / Star Trek ──────────────────────────────────── */
+
+/* Painel 3D — inclina levemente em direção ao cursor */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1100px) rotateX(2deg) rotateY(-1.25deg) translateY(-4px);
+}
+
+/* Grade de holodeck — piso em perspectiva 3D */
+.hud-grid {
+  position: absolute;
+  inset-inline: -35%;
+  bottom: -14%;
+  height: 58%;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-primary) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to top, color-mix(in oklab, var(--color-primary) 55%, transparent) 1px, transparent 1px);
+  background-size: 56px 44px;
+  transform: perspective(620px) rotateX(63deg);
+  transform-origin: center bottom;
+  opacity: 0.07;
+  mask-image: linear-gradient(to top, black 25%, transparent 92%);
+}
+
+.dark .hud-grid {
+  opacity: 0.14;
+}
+
+/* Rastro de dobra espacial */
+@keyframes warp-streak {
+  0%   { transform: translateX(-12vw) scaleX(0.35); opacity: 0; }
+  12%  { opacity: var(--warp-opacity, 0.7); }
+  85%  { opacity: var(--warp-opacity, 0.7); }
+  100% { transform: translateX(112vw) scaleX(1.15); opacity: 0; }
+}
+
+.warp-streak {
+  animation:
+    warp-streak
+    var(--warp-duration, 5s)
+    var(--warp-delay, 0s)
+    linear
+    infinite;
+}
+
+/* Luz de status piscando — console da ponte */
+@keyframes lcars-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}
+
+.lcars-blink {
+  animation: lcars-blink 1.6s steps(2, jump-none) infinite;
+}
+
+/* Display alfanumérico LCARS */
+.lcars-readout {
+  font-family: var(--font-ubuntu-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-3d,
+  .card-3d:hover {
+    transform: none;
+    transition: none;
+  }
+  .warp-streak,
+  .lcars-blink {
+    animation: none !important;
+  }
+  .warp-streak {
+    opacity: 0;
+  }
 }
 
 /* Respect reduced motion */

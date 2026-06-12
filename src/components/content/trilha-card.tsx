@@ -53,7 +53,7 @@ export function TrilhaCard({
     <Link
       href={`/trilhas/${slug}`}
       className={cn(
-        "group relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-border/70 bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5",
+        "card-3d group relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl rounded-tl-[1.75rem] border border-border/70 bg-card p-6 shadow-sm",
         categoryGlow[category],
         className,
       )}
@@ -62,7 +62,7 @@ export function TrilhaCard({
       <div
         aria-hidden="true"
         className={cn(
-          "absolute inset-x-0 top-0 h-[2px] bg-linear-to-r",
+          "absolute inset-x-0 top-0 h-[3px] rounded-full bg-linear-to-r",
           categoryTopBar[category],
         )}
       />
@@ -81,7 +81,7 @@ export function TrilhaCard({
       </div>
 
       <div className="space-y-2">
-        <h3 className="font-serif text-2xl font-bold tracking-tight text-foreground">
+        <h3 className="font-serif text-2xl font-bold uppercase tracking-[0.02em] text-foreground">
           {title}
         </h3>
         <p className="text-sm leading-6 text-muted-foreground">{description}</p>

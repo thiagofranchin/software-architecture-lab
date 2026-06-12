@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import {
-  Merriweather,
+  Antonio,
   Montserrat,
   Ubuntu_Mono,
 } from "next/font/google";
@@ -23,11 +23,10 @@ const fontSans = Montserrat({
   variable: "--font-montserrat",
 });
 
-const fontSerif = Merriweather({
+const fontDisplay = Antonio({
   display: "swap",
   subsets: ["latin"],
-  variable: "--font-merriweather",
-  weight: ["300", "400", "700", "900"],
+  variable: "--font-antonio",
 });
 
 const fontMono = Ubuntu_Mono({
@@ -100,13 +99,13 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable}`}
+      className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable}`}
     >
       <body className="flex min-h-screen flex-col bg-background antialiased">
         <Script
           id="theme-init"
           strategy="beforeInteractive"
-        >{`(()=>{try{var t=localStorage.getItem("theme");var d=t==="light"||t==="dark"?t:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.classList.toggle("dark",d==="dark")}catch(e){}})();`}</Script>
+        >{`(()=>{try{var t=localStorage.getItem("theme");var d=t==="light"?"light":"dark";document.documentElement.classList.toggle("dark",d==="dark")}catch(e){document.documentElement.classList.add("dark")}})();`}</Script>
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />

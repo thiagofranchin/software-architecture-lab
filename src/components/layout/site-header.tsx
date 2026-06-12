@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { LcarsBar } from "@/components/cosmic/lcars-bar";
+import { Stardate } from "@/components/cosmic/stardate";
 import { PageContainer } from "@/components/layout/page-container";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -28,33 +30,40 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/85 backdrop-blur-md dark:border-white/5 dark:bg-background/90">
-      {/* Linha de acento superior */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent"
-      />
-
       <PageContainer className="flex h-16 items-center justify-between gap-6">
-        {/* Logo */}
+        {/* Logo — registro da nave */}
         <Link
           aria-label="Página inicial do Software Architecture Lab"
-          className="group font-serif text-lg font-black tracking-tight whitespace-nowrap"
+          className="group flex items-center gap-3 whitespace-nowrap"
           href="/"
           onClick={closeMobile}
         >
-          <span className="text-primary transition-[text-shadow] group-hover:[text-shadow:0_0_12px_var(--color-primary)]">
-            Software
-          </span>{" "}
-          <span className="text-foreground">Architecture</span>{" "}
-          <span className="text-accent transition-[text-shadow] group-hover:[text-shadow:0_0_12px_var(--color-accent)]">
-            Lab
+          {/* Cotovelo LCARS */}
+          <span
+            aria-hidden="true"
+            className="hidden h-9 w-3 rounded-l-full bg-primary transition-shadow group-hover:shadow-[0_0_14px_var(--color-primary)] sm:block"
+          />
+          <span className="flex flex-col leading-none">
+            <span className="font-serif text-xl font-bold uppercase tracking-[0.08em]">
+              <span className="text-primary transition-[text-shadow] group-hover:[text-shadow:0_0_12px_var(--color-primary)]">
+                Software
+              </span>{" "}
+              <span className="text-foreground">Architecture</span>{" "}
+              <span className="text-accent transition-[text-shadow] group-hover:[text-shadow:0_0_12px_var(--color-accent)]">
+                Lab
+              </span>
+            </span>
+            <span className="mt-1 flex items-center gap-2">
+              <span className="lcars-readout text-primary/60">NCC-2266</span>
+              <Stardate className="hidden sm:inline" />
+            </span>
           </span>
         </Link>
 
-        {/* Nav desktop */}
+        {/* Nav desktop — botões-pílula do console */}
         <nav
           aria-label="Navegação principal"
-          className="hidden flex-1 items-center justify-center gap-0.5 md:flex"
+          className="hidden flex-1 items-center justify-center gap-1 md:flex"
         >
           {navItems.map((item) => {
             const active =
@@ -64,20 +73,13 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
+                  "rounded-full px-4 py-1.5 font-serif text-sm font-semibold uppercase tracking-[0.08em] transition-all duration-150",
                   active
-                    ? "bg-secondary text-secondary-foreground"
-                    : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:text-foreground dark:text-shadow-none dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.25)]",
+                    ? "bg-primary text-primary-foreground shadow-[0_0_16px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]"
+                    : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground",
                 )}
               >
                 {item.label}
-                {/* Indicador de rota ativa */}
-                {active && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute bottom-0 left-1/2 h-px w-4 -translate-x-1/2 rounded-full bg-primary opacity-70"
-                  />
-                )}
               </Link>
             );
           })}
@@ -100,12 +102,17 @@ export function SiteHeader() {
         </div>
       </PageContainer>
 
+      {/* Barra segmentada LCARS na base do console */}
+      <PageContainer>
+        <LcarsBar heightClass="h-[4px]" className="pb-1.5" />
+      </PageContainer>
+
       {mobileOpen ? (
         <div
           id="mobile-nav"
           className="border-t border-border/50 bg-background/95 backdrop-blur-md dark:border-white/5 md:hidden"
         >
-          <PageContainer className="flex flex-col gap-0.5 py-4">
+          <PageContainer className="flex flex-col gap-1 py-4">
             {navItems.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -115,10 +122,10 @@ export function SiteHeader() {
                   href={item.href}
                   onClick={closeMobile}
                   className={cn(
-                    "rounded-md px-3 py-2 text-base font-medium transition-colors",
+                    "rounded-full px-4 py-2 font-serif text-base font-semibold uppercase tracking-[0.08em] transition-colors",
                     active
-                      ? "bg-secondary text-secondary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground",
                   )}
                 >
                   {item.label}
